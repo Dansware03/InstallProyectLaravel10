@@ -3,6 +3,17 @@
   "description": "Asistente de instalación interactivo para aplicaciones Laravel 10",
   "type": "library",
   "version": "1.0.0",
+  "keywords": [
+    "laravel",
+    "installer",
+    "setup",
+    "wizard"
+  ],
+  "support": {
+    "email": "Dansware2003@gmail.com",
+    "issues": "https://github.com/Dansware03/laravel-installer/issues",
+    "source": "https://github.com/Dansware03/laravel-installer"
+  },
   "license": "MIT",
   "authors": [
     {
@@ -33,12 +44,6 @@
       ]
     }
   },
-  "repositories": [
-    {
-      "type": "path",
-      "url": "https://github.com/Dansware03/laravel-installer"
-    }
-  ],
   "minimum-stability": "dev",
   "prefer-stable": true
 }
