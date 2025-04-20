@@ -12,7 +12,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('installation.finish') }}" class="space-y-6">
+    <form method="POST" action="{{ route('installation.finish.store') }}" class="space-y-6">
         @csrf
 
         <div>

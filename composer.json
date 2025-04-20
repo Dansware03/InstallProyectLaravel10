@@ -10,7 +10,7 @@
     "wizard"
   ],
   "support": {
-    "email": "Dansware2003@gmail.com",
+    "email": "dansware2003@gmail.com",
     "issues": "https://github.com/Dansware03/laravel-installer/issues",
     "source": "https://github.com/Dansware03/laravel-installer"
   },
@@ -18,7 +18,7 @@
   "authors": [
     {
       "name": "Maiker Bravo",
-      "email": "Dansware2003@gmail.com"
+      "email": "dansware2003@gmail.com"
     }
   ],
   "require": {

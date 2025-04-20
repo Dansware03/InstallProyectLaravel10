@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Capa_2" data-name="Capa 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 942.86 182.1">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#Degradado_sin_nombre_1107);
+      }
+
+      .cls-2 {
+        font-size: 131.99px;
+        letter-spacing: .2em;
+      }
+
+      .cls-2, .cls-3 {
+        font-family: CascadiaCodeRoman-Bold, 'Cascadia Code';
+        font-variation-settings: 'wght' 700;
+        font-weight: 700;
+      }
+
+      .cls-4 {
+        fill: url(#Degradado_sin_nombre_288);
+      }
+
+      .cls-5 {
+        fill: url(#Degradado_sin_nombre_767);
+      }
+
+      .cls-3 {
+        font-size: 37.84px;
+        letter-spacing: 1.2em;
+      }
+
+      .cls-6 {
+        fill: url(#Degradado_sin_nombre_1362);
+      }
+
+      .cls-7 {
+        fill: #ff0048;
+      }
+
+      .cls-8 {
+        fill: url(#Degradado_sin_nombre_1185);
+      }
+    </style>
+    <linearGradient id="Degradado_sin_nombre_767" data-name="Degradado sin nombre 767" x1="3.7" y1="59.84" x2="58.26" y2="114.4" gradientUnits="userSpaceOnUse">
+      <stop offset=".12" stop-color="#0cf"/>
+      <stop offset=".5" stop-color="#4b6eb2"/>
+    </linearGradient>
+    <linearGradient id="Degradado_sin_nombre_288" data-name="Degradado sin nombre 288" x1="0" y1="59.09" x2="61.86" y2="59.09" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0083ff"/>
+      <stop offset=".34" stop-color="#2b9bf0"/>
+      <stop offset="1" stop-color="#0cf"/>
+    </linearGradient>
+    <linearGradient id="Degradado_sin_nombre_1107" data-name="Degradado sin nombre 1107" x1="71.08" y1="68.45" x2="125.64" y2="123.02" gradientUnits="userSpaceOnUse">
+      <stop offset=".32" stop-color="#980020"/>
+      <stop offset="1" stop-color="#903"/>
+    </linearGradient>
+    <linearGradient id="Degradado_sin_nombre_1185" data-name="Degradado sin nombre 1185" x1="79.11" y1="165.35" x2="120.6" y2="93.49" gradientUnits="userSpaceOnUse">
+      <stop offset=".63" stop-color="#c70048"/>
+      <stop offset=".97" stop-color="#980020"/>
+    </linearGradient>
+    <radialGradient id="Degradado_sin_nombre_1362" data-name="Degradado sin nombre 1362" cx="64.95" cy="91.32" fx="64.95" fy="91.32" r="55.7" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#282828"/>
+      <stop offset=".07" stop-color="#282828"/>
+      <stop offset="1" stop-color="#282828"/>
+    </radialGradient>
+  </defs>
+  <g id="MODO_CLARO" data-name="MODO CLARO">
+    <g id="HORIZONTAL">
+      <g>
+        <g>
+          <g>
+            <path class="cls-5" d="M40.89,114.4c4.8,4.8,12.57,4.8,17.37,0h0c4.8-4.79,4.8-12.57,0-17.37L21.07,59.84c-4.8-4.8-12.57-4.8-17.37,0h0c-4.8,4.8-4.8,12.57,0,17.37l22,21.95,15.19,15.25Z"/>
+            <path class="cls-4" d="M58.26,22.62c-4.8-4.8-12.57-4.8-17.37,0L3.7,59.81c-4.7,4.7-4.99,12.05-.49,16.86l.19.2.25.25s.03.04.05.06c.02.02.04.04.06.06l21.94,21.91c-11.81-11.81,4.05-30.65,4.05-30.65h0s28.52-28.52,28.52-28.52c4.8-4.8,4.8-12.57,0-17.37Z"/>
+          </g>
+          <g>
+            <path class="cls-1" d="M88.45,68.45c-4.8-4.8-12.57-4.8-17.37,0h0c-4.8,4.8-4.8,12.57,0,17.37l37.19,37.19c4.8,4.8,12.57,4.8,17.37,0h0c4.8-4.8,4.8-12.57,0-17.37l-22-21.95-15.19-15.25Z"/>
+            <path class="cls-8" d="M71.08,160.23c4.8,4.8,12.57,4.8,17.37,0l37.19-37.19c4.7-4.7,4.99-12.05.49-16.86l-.19-.2-.25-.25s-.03-.04-.05-.06c-.02-.02-.04-.04-.06-.06l-21.94-21.91c11.81,11.81-4.05,30.65-4.05,30.65h0s-28.52,28.52-28.52,28.52c-4.8,4.8-4.8,12.57,0,17.37Z"/>
+          </g>
+          <path class="cls-6" d="M57.07,155.33c-1.96,6.27-8.63,9.76-14.9,7.8h0c-6.27-1.96-9.76-8.63-7.8-14.9L72.84,27.31c1.96-6.27,8.63-9.76,14.9-7.8h0c6.27,1.96,9.76,8.63,7.8,14.9l-38.47,120.92Z"/>
+        </g>
+        <g>
+          <text class="cls-2" transform="translate(139.35 111.76)"><tspan x="0" y="0">DANSWARE</tspan></text>
+          <text class="cls-3" transform="translate(270.37 163.83)"><tspan class="cls-7" x="0" y="0">DEV</tspan><tspan x="202.75" y="0">ELOPER</tspan></text>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

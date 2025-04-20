@@ -1,25 +1,34 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Dansware\LaravelInstaller\Controllers\InstallationController;
+use Dansware\LaravelInstaller\Controllers\WelcomeController;
+use Dansware\LaravelInstaller\Controllers\RequirementsController;
+use Dansware\LaravelInstaller\Controllers\DatabaseController;
+use Dansware\LaravelInstaller\Controllers\EnvironmentController;
+use Dansware\LaravelInstaller\Controllers\FinishController;
 
-Route::group([
-    'prefix' => config('installer.route', 'install'),
-    'as' => 'installation.',
-    'middleware' => ['web'],
-], function () {
-    // Verificar si la aplicación ya está instalada
-    Route::middleware(['installation.not-installed'])->group(function () {
-        // Rutas de instalación
-        Route::get('/', [InstallationController::class, 'welcome'])->name('welcome');
-        Route::get('/requirements', [InstallationController::class, 'requirements'])->name('requirements');
-        Route::get('/database', [InstallationController::class, 'database'])->name('database');
-        Route::post('/database', [InstallationController::class, 'saveDatabase'])->name('saveDatabase');
-        Route::post('/test-connection', [InstallationController::class, 'testConnection'])->name('testConnection');
-        Route::get('/finish', [InstallationController::class, 'finish'])->name('finish');
-        Route::post('/finish', [InstallationController::class, 'saveFinish'])->name('saveFinish');
-    });
+Route::group(['prefix' => config('installer.route', 'install'), 'as' => 'installation.', 'middleware' => ['web', 'installation.not-installed']], function () {
+    // Bienvenida
+    Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
-    // Redirección si ya está instalado
-    Route::get('/installed', [InstallationController::class, 'installed'])->name('installed');
+    // Requisitos
+    Route::get('/requirements', [RequirementsController::class, 'index'])->name('requirements');
+
+    // Base de datos
+    Route::get('/database', [DatabaseController::class, 'index'])->name('database');
+    Route::post('/database', [DatabaseController::class, 'store'])->name('database.store');
+    Route::post('/database/test-connection', [DatabaseController::class, 'testConnection'])->name('database.test');
+
+    // Entorno
+    Route::get('/environment', [EnvironmentController::class, 'index'])->name('environment');
+    Route::post('/environment', [EnvironmentController::class, 'store'])->name('environment.store');
+
+    // Finalizar
+    Route::get('/finish', [FinishController::class, 'index'])->name('finish');
+    Route::post('/finish', [FinishController::class, 'store'])->name('finish.store');
 });
+
+// Ruta para cuando ya está instalado
+Route::get('/installed', [FinishController::class, 'installed'])
+    ->name('installation.installed')
+    ->middleware(['web', 'installation.installed']);

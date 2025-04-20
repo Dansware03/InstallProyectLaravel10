@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Capa_2" data-name="Capa 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 970.29 180.17">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#Degradado_sin_nombre_1306);
+      }
+
+      .cls-2, .cls-3 {
+        fill: #fff;
+      }
+
+      .cls-4 {
+        fill: url(#Degradado_sin_nombre_1107);
+      }
+
+      .cls-5 {
+        fill: url(#Degradado_sin_nombre_288);
+      }
+
+      .cls-3 {
+        font-size: 134.28px;
+        letter-spacing: .2em;
+      }
+
+      .cls-3, .cls-6 {
+        font-family: CascadiaCode-Regular, 'Cascadia Code';
+        font-variation-settings: 'wght' 400;
+      }
+
+      .cls-6 {
+        font-size: 38.5px;
+        letter-spacing: 1.2em;
+      }
+
+      .cls-7 {
+        fill: url(#Degradado_sin_nombre_767);
+      }
+
+      .cls-8 {
+        fill: #ff0048;
+      }
+
+      .cls-9 {
+        fill: url(#Degradado_sin_nombre_1185);
+      }
+    </style>
+    <linearGradient id="Degradado_sin_nombre_767" data-name="Degradado sin nombre 767" x1="3.81" y1="49.88" x2="60.01" y2="106.08" gradientUnits="userSpaceOnUse">
+      <stop offset=".12" stop-color="#0cf"/>
+      <stop offset=".5" stop-color="#4b6eb2"/>
+    </linearGradient>
+    <linearGradient id="Degradado_sin_nombre_288" data-name="Degradado sin nombre 288" x1="0" y1="49.11" x2="63.72" y2="49.11" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0083ff"/>
+      <stop offset=".34" stop-color="#2b9bf0"/>
+      <stop offset="1" stop-color="#0cf"/>
+    </linearGradient>
+    <linearGradient id="Degradado_sin_nombre_1107" data-name="Degradado sin nombre 1107" x1="73.21" y1="58.75" x2="129.41" y2="114.95" gradientUnits="userSpaceOnUse">
+      <stop offset=".32" stop-color="#980020"/>
+      <stop offset="1" stop-color="#903"/>
+    </linearGradient>
+    <linearGradient id="Degradado_sin_nombre_1185" data-name="Degradado sin nombre 1185" x1="81.49" y1="158.56" x2="124.22" y2="84.54" gradientUnits="userSpaceOnUse">
+      <stop offset=".63" stop-color="#c70048"/>
+      <stop offset=".97" stop-color="#980020"/>
+    </linearGradient>
+    <linearGradient id="Degradado_sin_nombre_1306" data-name="Degradado sin nombre 1306" x1="34.84" y1="82.31" x2="98.97" y2="82.31" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff5eb"/>
+      <stop offset=".03" stop-color="#fef4eb"/>
+      <stop offset=".48" stop-color="#f3f1ee"/>
+      <stop offset="1" stop-color="#f0f0f0"/>
+    </linearGradient>
+  </defs>
+  <g id="MODO_OSCURO" data-name="MODO OSCURO">
+    <g id="HORIZONTAL">
+      <g>
+        <g>
+          <g>
+            <path class="cls-7" d="M42.12,106.07c4.94,4.94,12.95,4.94,17.89,0h0c4.94-4.94,4.94-12.95,0-17.89L21.7,49.88c-4.94-4.94-12.95-4.94-17.89,0h0c-4.94,4.94-4.94,12.95,0,17.89l22.66,22.61,15.65,15.7Z"/>
+            <path class="cls-5" d="M60.01,11.54c-4.94-4.94-12.95-4.94-17.89,0L3.81,49.85c-4.84,4.84-5.14,12.41-.51,17.37l.2.21.25.25s.04.04.05.06c.02.02.04.04.06.06l22.6,22.57c-12.17-12.17,4.17-31.57,4.17-31.57h0s29.37-29.37,29.37-29.37c4.94-4.94,4.94-12.95,0-17.89Z"/>
+          </g>
+          <g>
+            <path class="cls-4" d="M91.11,58.75c-4.94-4.94-12.95-4.94-17.89,0h0c-4.94,4.94-4.94,12.95,0,17.89l38.31,38.31c4.94,4.94,12.95,4.94,17.89,0h0c4.94-4.94,4.94-12.95,0-17.89l-22.66-22.61-15.65-15.7Z"/>
+            <path class="cls-9" d="M73.21,153.28c4.94,4.94,12.95,4.94,17.89,0l38.31-38.31c4.84-4.84,5.14-12.41.51-17.37l-.2-.21-.26-.25s-.03-.04-.05-.06c-.02-.02-.04-.04-.06-.06l-22.6-22.57c12.17,12.17-4.17,31.57-4.17,31.57h0s-29.37,29.37-29.37,29.37c-4.94,4.94-4.94,12.95,0,17.89Z"/>
+          </g>
+          <path class="cls-1" d="M58.78,148.24c-2.02,6.46-8.89,10.05-15.35,8.03h0c-6.45-2.02-10.05-8.89-8.03-15.35L75.03,16.38c2.02-6.46,8.89-10.05,15.35-8.03h0c6.45,2.02,10.05,8.89,8.03,15.35l-39.63,124.55Z"/>
+        </g>
+        <g>
+          <text class="cls-3" transform="translate(152.83 113.7)"><tspan x="0" y="0">DANSWARE</tspan></text>
+          <text class="cls-6" transform="translate(283.7 161.57)"><tspan class="cls-8" x="0" y="0">DEV</tspan><tspan class="cls-2" x="206.27" y="0">ELOPER</tspan></text>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

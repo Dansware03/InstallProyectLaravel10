@@ -12,7 +12,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('installation.saveDatabase') }}" class="space-y-6">
+    <form method="POST" action="{{ route('installation.database.store') }}" class="space-y-6">
         @csrf
         <div>
             <label for="database_type" class="block font-medium">Tipo de Base de Datos</label>
