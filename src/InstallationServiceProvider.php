@@ -4,6 +4,8 @@ namespace Dansware\LaravelInstaller;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Dansware\LaravelInstaller\Middleware\NotInstalledMiddleware;
+use Dansware\LaravelInstaller\Middleware\InstalledMiddleware;
 
 class InstallationServiceProvider extends ServiceProvider
 {
@@ -26,6 +28,11 @@ class InstallationServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // Registrar middlewares
+        $router = $this->app['router'];
+        $router->aliasMiddleware('installation.not-installed', NotInstalledMiddleware::class);
+        $router->aliasMiddleware('installation.installed', InstalledMiddleware::class);
+
         // Carga rutas
         $this->loadRoutesFrom(__DIR__.'/routes/web.php');
 

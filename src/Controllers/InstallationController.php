@@ -232,7 +232,12 @@ class InstallationController extends Controller
             }
 
             // Crear archivo .installed para indicar que la instalación está completa
-            File::put(storage_path('.installed'), date('Y-m-d H:i:s'));
+            try {
+                File::put(storage_path('.installed'), date('Y-m-d H:i:s'));
+                chmod(storage_path('.installed'), 0644); // Asegurar permisos adecuados
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', 'No se pudo crear el archivo de instalación: ' . $e->getMessage());
+            }
 
             // Limpiar caché
             Artisan::call('config:clear');

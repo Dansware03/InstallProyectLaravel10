@@ -2,6 +2,7 @@
   "name": "dansware03/laravel-installer",
   "description": "Asistente de instalación interactivo para aplicaciones Laravel 10",
   "type": "library",
+  "version": "1.0.0",
   "license": "MIT",
   "authors": [
     {
