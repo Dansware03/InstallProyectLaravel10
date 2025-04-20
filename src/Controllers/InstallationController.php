@@ -1,6 +1,6 @@
 <?php
 
-namespace TuUsuario\LaravelInstaller\Controllers;
+namespace Dansware\LaravelInstaller\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;

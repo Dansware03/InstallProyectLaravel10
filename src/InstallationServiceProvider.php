@@ -1,6 +1,6 @@
 <?php
 
-namespace TuUsuario\LaravelInstaller;
+namespace Dansware\LaravelInstaller;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
