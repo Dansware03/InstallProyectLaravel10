@@ -13,54 +13,113 @@ Un asistente de instalación interactivo para aplicaciones Laravel 10, permitien
 
 ## Instalación
 
-### 1. Agregar el paquete a tu proyecto Laravel
+1. Agregar el paquete a tu proyecto Laravel
 
 ```bash
 composer require Dansware03/laravel-installer
 ```
 
-### 2. Publicar los assets del paquete (opcional)
+2. Registra el middleware global en `app/Http/Kernel.php`:
 
-```bash
-php artisan vendor:publish --tag=installer-assets
+```php
+protected $middleware = [
+    // Otros middlewares...
+    \Dansware\LaravelInstaller\Middleware\CheckInstallationMiddleware::class,
+];
 ```
 
-### 3. Publicar la configuración (opcional)
+3. Publica la configuración (opcional pero recomendado):
 
 ```bash
 php artisan vendor:publish --tag=installer-config
 ```
 
-### 4. Publicar las vistas para personalizarlas (opcional)
+4. Publica los assets (opcional):
+
+```bash
+php artisan vendor:publish --tag=installer-assets
+```
+
+### Personalización
+
+Puedes personalizar varios aspectos del instalador editando el archivo de configuración `config/installer.php` después de publicarlo:
+
+- Cambiar la ruta del instalador (por defecto es `/install`)
+- Modificar el título y logo del instalador
+- Ajustar los requisitos del servidor
+- Personalizar los pasos del instalador
+
+### Consideraciones importantes:
+
+- Asegúrate de que el directorio `storage` tenga permisos de escritura para que se pueda crear el archivo `.installed`
+- Si estás usando un sistema de control de versiones, considera agregar el archivo `.installed` al `.gitignore`
+- El instalador modificará tu archivo `.env` para configurar la base de datos y otros ajustes básicos
+
+### Flujo de uso:
+
+1. Instala una nueva aplicación Laravel
+2. Instala el paquete instalador
+3. Accede a tu aplicación por primera vez, serás redirigido automáticamente al instalador
+4. Sigue los pasos del asistente:
+   - Bienvenida
+   - Verificación de requisitos
+   - Configuración de base de datos
+   - Finalización y ejecución de migraciones
+5. Una vez completada la instalación, serás redirigido a la página principal de tu aplicación
+
+### Solución de problemas:
+
+Si necesitas reiniciar el proceso de instalación, simplemente elimina el archivo `.installed` de tu directorio `storage`.
+
+```bash
+rm storage/.installed
+```
+
+### Desarrollo avanzado:
+
+Si deseas extender la funcionalidad del instalador, puedes publicar las vistas y modificarlas:
 
 ```bash
 php artisan vendor:publish --tag=installer-views
 ```
 
-## Uso
-
-Una vez instalado el paquete, simplemente accede a la URL de tu aplicación Laravel y agrega `/install` al final. Por ejemplo:
-
-```
-http://tu-aplicacion.test/install
-```
-
-El asistente te guiará a través del proceso de instalación paso a paso:
-
-1. **Bienvenida:** Introducción al proceso de instalación
-2. **Comprobación de Requisitos:** Verificación automática de que tu servidor cumple con todos los requisitos necesarios
-3. **Configuración de Base de Datos:** Configuración de la conexión a la base de datos (MySQL o SQLite)
-4. **Finalización:** Ajustes finales y ejecución de migraciones
-
-## Personalización
-
-Puedes personalizar varios aspectos del instalador editando el archivo de configuración `config/installer.php` después de publicarlo.
-
 ## Requisitos
 
-- PHP >= 8.1
+- PHP >= 8.2
 - Laravel 10.x
 
+## Estructura del paquete
+```
+laravel-installer/
+├── composer.json
+├── README.md
+├── LICENSE.md
+├── src/
+│   ├── InstallationServiceProvider.php
+│   ├── Controllers/
+│   │   └── InstallationController.php
+│   ├── helpers.php
+│   ├── routes/
+│   │   └── web.php
+│   └── resources/
+│       ├── views/
+│       │   ├── layouts/
+│       │   │   └── installer.blade.php
+│       │   ├── installation/
+│       │   │   ├── welcome.blade.php
+│       │   │   ├── requirements.blade.php
+│       │   │   ├── database.blade.php
+│       │   │   └── finish.blade.php
+│       │   └── components/
+│       │       ├── button.blade.php
+│       │       ├── input.blade.php
+│       │       └── alert.blade.php
+│       └── assets/
+│           ├── css/
+│           │   └── installer.css
+│           └── js/
+│               └── installer.js
+```
 ## Licencia
 
 Este paquete está bajo la [Licencia MIT](LICENSE.md).
