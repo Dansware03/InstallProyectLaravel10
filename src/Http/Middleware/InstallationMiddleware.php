@@ -8,8 +8,16 @@ use Dansware03\LaravelInstaller\InstallerManager;
 
 class InstallationMiddleware
 {
+    /**
+     * The installer manager instance.
+     *
+     * @var InstallerManager
+     */
     protected $installer;
 
+    /**
+     * Create a new middleware instance.
+     */
     public function __construct(InstallerManager $installer)
     {
         $this->installer = $installer;

@@ -7,17 +7,39 @@ use Dansware03\LaravelInstaller\InstallerManager;
 
 class InstallCommand extends Command
 {
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
     protected $signature = 'installer:install';
-    protected $description = 'Install the application via command line';
 
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Install the Laravel application using command line';
+
+    /**
+     * The installer manager instance.
+     *
+     * @var InstallerManager
+     */
     protected $installer;
 
+    /**
+     * Create a new command instance.
+     */
     public function __construct(InstallerManager $installer)
     {
         parent::__construct();
         $this->installer = $installer;
     }
 
+    /**
+     * Execute the console command.
+     */
     public function handle()
     {
         $this->info('Laravel Installer Command');
