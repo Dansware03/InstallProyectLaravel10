@@ -6,68 +6,59 @@
 
 @section('description', 'Decida si desea ejecutar las migraciones de la base de datos')
 
-@section('steps')
-<ul class="step-indicator-vertical">
-    <li class="step completed">
-        <span class="step-number"><i class="fas fa-check"></i></span>
-        <span class="step-label">Requisitos</span>
-    </li>
-    <li class="step completed">
-        <span class="step-number"><i class="fas fa-check"></i></span>
-        <span class="step-label">Base de Datos</span>
-    </li>
-    <li class="step active">
-        <span class="step-number">3</span>
-        <span class="step-label">Migraciones</span>
-    </li>
-    <li class="step">
-        <span class="step-number">4</span>
-        <span class="step-label">Entorno</span>
-    </li>
-    <li class="step">
-        <span class="step-number">5</span>
-        <span class="step-label">Configuración Final</span>
-    </li>
-    <li class="step">
-        <span class="step-number">6</span>
-        <span class="step-label">Instalación</span>
-    </li>
-</ul>
-@endsection
+@php
+$stepsData = [
+    'total' => [
+        ['name' => 'Requisitos', 'status' => 'completed'],
+        ['name' => 'Base de Datos', 'status' => 'completed'],
+        ['name' => 'Migraciones', 'status' => 'active'],
+        ['name' => 'Entorno', 'status' => 'pending'],
+        ['name' => 'Config. Final', 'status' => 'pending'],
+        ['name' => 'Instalación', 'status' => 'pending'],
+    ]
+];
+@endphp
 
 @section('content')
-<form method="POST" action="{{ route('installer.advanced.migrations.process') }}">
-    @csrf
-
-    <div class="alert alert-success">
-        <i class="fas fa-check-circle me-2"></i>
-        <strong>¡Conexión Exitosa!</strong> Los datos de la base de datos son correctos.
+    <div class="alert alert-success d-flex align-items-center" role="alert">
+        <i class="fas fa-check-circle fa-2x me-3"></i>
+        <div>
+            <strong>¡Conexión a Base de Datos Exitosa!</strong> Los datos proporcionados son correctos.
+        </div>
     </div>
 
-    <h4 class="mb-3"><i class="fas fa-database me-2"></i>Ejecutar Migraciones</h4>
-    <p>
-        Las migraciones configuran la estructura de tablas necesaria para su aplicación.
+    <h5 class="mt-4 mb-3"><i class="fas fa-layer-group me-2 text-primary"></i>Ejecutar Migraciones</h5>
+    <p class="text-muted small mb-2">
+        Las migraciones configuran la estructura de tablas necesaria para su aplicación (ej. tabla de usuarios).
+    </p>
+    <p class="text-muted small mb-3">
         Si ya tiene tablas en su base de datos o desea crearlas manualmente más tarde, puede omitir este paso.
-    </p>
-    <p>
-        <strong>Nota:</strong> Si omite este paso, la creación automática del usuario administrador también se omitirá.
+        <strong>Importante:</strong> Si omite este paso, la creación automática del usuario administrador también se omitirá.
     </p>
 
-    <div class="form-check form-switch mb-4 p-3 border rounded">
-        <input class="form-check-input" type="checkbox" role="switch" id="run_migrations" name="run_migrations" value="yes"
-               {{ old('run_migrations', session('installer.migrations_run', true)) ? 'checked' : '' }}>
-        <label class="form-check-label" for="run_migrations">
-            Sí, ejecutar las migraciones de la base de datos.
-        </label>
-    </div>
+    @error('migrations')
+        <div class="alert alert-danger mt-3 py-2">
+            <i class="fas fa-times-circle me-2"></i>{{ $message }}
+        </div>
+    @enderror
 
-    <div class="d-flex justify-content-between mt-4">
-        <a href="{{ route('installer.advanced.database') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left me-2"></i>Anterior
-        </a>
-        <button type="submit" class="btn btn-primary">
-            Siguiente: Configuración de Entorno <i class="fas fa-arrow-right ms-2"></i>
-        </button>
-    </div>
-</form>
+    <form method="POST" action="{{ route('installer.advanced.migrations.process') }}" id="migrations-form">
+        @csrf
+        <div class="form-check form-switch p-3 border rounded mb-3" style="background-color: #f8f9fa;">
+            <input class="form-check-input" type="checkbox" role="switch" id="run_migrations" name="run_migrations" value="yes"
+                   {{ old('run_migrations', session('installer.migrations_run', true)) ? 'checked' : '' }} style="transform: scale(1.3); margin-top: 0.3em;">
+            <label class="form-check-label ps-2" for="run_migrations" style="font-weight: 500;">
+                Sí, ejecutar las migraciones de la base de datos.
+            </label>
+        </div>
+    </form>
+@endsection
+
+@section('footer-actions')
+    <a href="{{ route('installer.advanced.database') }}" class="btn btn-installer">
+        <i class="fas fa-arrow-left me-1"></i> Anterior
+    </a>
+    <button type="submit" form="migrations-form" class="btn btn-installer-primary">
+        Siguiente <i class="fas fa-arrow-right ms-1"></i>
+    </button>
 @endsection
