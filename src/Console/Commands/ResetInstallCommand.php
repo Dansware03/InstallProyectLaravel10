@@ -62,24 +62,13 @@ class ResetInstallCommand extends Command
             try {
                 File::copy($envExamplePath, $envPath);
                 $this->line('<fg=green>[✔]</> .env file has been reset from .env.example.');
-
-                // 3. Generar nueva APP_KEY
-                $this->call('key:generate', ['--force' => true]);
-
-                // Verificar si la APP_KEY fue realmente escrita y no está vacía
-                $envContent = File::get($envPath);
-                if (preg_match('/^APP_KEY=(.+)$/m', $envContent, $matches) && !empty(trim($matches[1])) && strlen(trim($matches[1])) > 16 ) { // Verifica que no esté vacía y tenga una longitud razonable
-                    $this->line('<fg=green>[✔]</> New APP_KEY generated and verified in .env file.');
-                } else {
-                    $this->error('[✘] APP_KEY generation may have failed. APP_KEY is missing, empty, or too short in .env file.');
-                    $this->warn('   Please check file permissions for ".env" or run "php artisan key:generate" manually.');
-                }
+                $this->warn('   IMPORTANT: Please run "php artisan key:generate" manually to set your application key.');
 
             } catch (\Exception $e) {
-                $this->error('[✘] Failed to reset .env file or generate/verify APP_KEY: ' . $e->getMessage());
+                $this->error('[✘] Failed to reset .env file: ' . $e->getMessage());
             }
         } else {
-            $this->warn('[!] .env.example not found. Skipping .env reset and key generation.');
+            $this->warn('[!] .env.example not found. Skipping .env reset.');
         }
 
         // 4. Restaurar routes/api.php y asegurar su existencia
