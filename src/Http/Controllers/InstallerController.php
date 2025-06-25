@@ -300,8 +300,8 @@ class InstallerController extends Controller
             // Actualizar .env con configuración de BD
             $this->installer->updateEnvironmentFile($dbConfig);
 
-            // Ejecutar migraciones
-            if (!$this->installer->runMigrations()) { // runMigrations() ahora verifica Schema::hasTable('users')
+            // Ejecutar migraciones, pasando la configuración de BD explícitamente
+            if (!$this->installer->runMigrations($dbConfig)) { // <--- Pasar $dbConfig
                 $stepsData = session('installer_steps_data_before_error', $this->getStepsDataForAdvancedMigrations('active')); // Fallback
                 return back()->withErrors(['migrations' => 'Error al ejecutar las migraciones o la tabla de usuarios no se creó correctamente. Verifique los logs del servidor para más detalles.'])
                              ->withInput()->with(compact('stepsData'));

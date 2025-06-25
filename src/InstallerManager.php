@@ -138,8 +138,10 @@ class InstallerManager
 
     /**
      * Ejecutar migraciones
+     * @param array|null $dbConfig La configuración de BD que se acaba de escribir en .env (opcional).
+     *                             Si se proporciona, se usará para una verificación de Schema más directa.
      */
-    public function runMigrations(): bool
+    public function runMigrations(array $dbConfig = null): bool
     {
         try {
             // Clear config cache to ensure fresh database connection details from .env are used
@@ -149,27 +151,61 @@ class InstallerManager
             // It's good practice to refresh the application's database connection
             // as .env might have just been updated.
             // Flushing and reconnecting the default connection.
-            DB::purge(config('database.default'));
-            DB::reconnect(config('database.default'));
-            $dbNameBeforeMigrate = DB::connection(config('database.default'))->getDatabaseName();
-            \Log::info('Installer: Database connection purged and reconnected. DB name before migrate: ' . $dbNameBeforeMigrate);
+            $defaultConnectionName = config('database.default');
+            DB::purge($defaultConnectionName);
+            DB::reconnect($defaultConnectionName);
+            $dbNameBeforeMigrate = DB::connection($defaultConnectionName)->getDatabaseName();
+            \Log::info('Installer: Database connection purged and reconnected. DB name before migrate: ' . $dbNameBeforeMigrate . ' on connection: ' . $defaultConnectionName);
 
             $exitCode = Artisan::call('migrate', [
                 '--force' => true,
             ]);
 
-            $dbNameAfterMigrate = DB::connection(config('database.default'))->getDatabaseName();
-            \Log::info('Installer: Artisan migrate command finished. DB name after migrate: ' . $dbNameAfterMigrate);
+            $dbNameAfterMigrate = DB::connection($defaultConnectionName)->getDatabaseName(); // Puede fallar si la BD no existe
+            \Log::info('Installer: Artisan migrate command finished with exit code ' . $exitCode . '. DB name after migrate: ' . $dbNameAfterMigrate . ' on connection: ' . $defaultConnectionName);
 
             if ($exitCode === 0) {
-                \Log::info('Installer: Artisan migrate command reported success (exit code 0).');
+                \Log::info('Installer: Artisan migrate command reported success (exit code 0). Verifying schema...');
 
-                // Verificar explícitamente si la tabla 'users' existe después de las migraciones
-                // usando la conexión por defecto explícitamente.
-                $usersTableExists = \Illuminate\Support\Facades\Schema::connection(config('database.default'))->hasTable('users');
+                $usersTableExists = false;
+                $verificationConnectionName = $defaultConnectionName;
+
+                if ($dbConfig && isset($dbConfig['DB_HOST'], $dbConfig['DB_DATABASE'], $dbConfig['DB_USERNAME'])) {
+                    // Si se pasó $dbConfig (flujo avanzado), usarlo para una conexión de verificación temporal
+                    // Esto asegura que estamos verificando contra la BD que acabamos de configurar.
+                    $tempConnectionName = 'installer_verify_migration';
+                    config(["database.connections.{$tempConnectionName}" => [
+                        'driver' => $dbConfig['DB_CONNECTION'] ?? 'mysql',
+                        'host' => $dbConfig['DB_HOST'],
+                        'port' => $dbConfig['DB_PORT'] ?? '3306',
+                        'database' => $dbConfig['DB_DATABASE'],
+                        'username' => $dbConfig['DB_USERNAME'],
+                        'password' => $dbConfig['DB_PASSWORD'] ?? '',
+                        'charset' => 'utf8mb4',
+                        'collation' => 'utf8mb4_unicode_ci',
+                        'prefix' => '',
+                        'strict' => true,
+                        'engine' => null,
+                    ]]);
+                    $verificationConnectionName = $tempConnectionName;
+                    \Log::info('Installer: Using temporary connection for Schema check: ' . $tempConnectionName . ' with DB: ' . $dbConfig['DB_DATABASE']);
+                } else {
+                    \Log::info('Installer: Using default connection for Schema check: ' . $defaultConnectionName);
+                }
+
+                try {
+                    $usersTableExists = \Illuminate\Support\Facades\Schema::connection($verificationConnectionName)->hasTable('users');
+                } catch (\Exception $schemaException) {
+                    \Log::error('Installer: Exception during Schema::hasTable check on connection ' . $verificationConnectionName, [
+                        'message' => $schemaException->getMessage(),
+                        'db_name' => $dbConfig ? $dbConfig['DB_DATABASE'] : DB::connection($defaultConnectionName)->getDatabaseName(),
+                    ]);
+                    // Si la conexión de Schema falla, no podemos confirmar, así que asumimos que la tabla no existe.
+                    $usersTableExists = false;
+                }
 
                 if ($usersTableExists) {
-                    \Log::info('Installer: Schema::hasTable("users") confirmed table exists after migration on DB: ' . $dbNameAfterMigrate);
+                    \Log::info('Installer: Schema::hasTable("users") confirmed table exists after migration on DB: ' . ($dbConfig ? $dbConfig['DB_DATABASE'] : $dbNameAfterMigrate));
                     return true;
                 } else {
                     \Log::error('Installer: Schema::hasTable("users") reports table DOES NOT exist after Artisan migrate success (exit code 0) on DB: ' . $dbNameAfterMigrate . '. This is highly unexpected.');
