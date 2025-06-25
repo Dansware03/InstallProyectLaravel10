@@ -97,3 +97,7 @@
         <i class="fas fa-sync-alt me-1"></i> Verificar Nuevamente
     </button>
 @endsection
+
+@push('scripts')
+{{-- No scripts specific to this view for now, but ensuring the stack is properly handled. --}}
+@endpush

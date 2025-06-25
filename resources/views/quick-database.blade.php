@@ -93,3 +93,7 @@ $stepsData = [
         <i class="fas fa-rocket me-1"></i> Iniciar Instalación Rápida
     </button>
 @endsection
+
+@push('scripts')
+{{-- No scripts specific to this view for now, but ensuring the stack is properly handled. --}}
+@endpush
