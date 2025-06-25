@@ -376,11 +376,24 @@
                 border-bottom: 3px solid transparent;
                 min-width: 70px;
                 /* Ancho mínimo para cada paso */
+                max-width: 90px; /* Para controlar la expansión si el texto es muy largo */
+                overflow: hidden; /* Evitar que el contenido desborde el contenedor del paso */
             }
 
             .step-indicator-vertical .step .step-number {
                 margin-right: 0;
                 margin-bottom: 5px;
+            }
+
+            .step-indicator-vertical .step .step-label {
+                word-wrap: break-word; /* Permite que las palabras largas se dividan */
+                overflow-wrap: break-word; /* Estándar actual para word-wrap */
+                -webkit-hyphens: auto; /* Para navegadores WebKit */
+                -ms-hyphens: auto; /* Para IE/Edge */
+                hyphens: auto; /* Estándar */
+                line-height: 1.25; /* Ajustar espaciado para texto envuelto */
+                font-size: 0.8rem; /* Reducir un poco el tamaño para mejor ajuste */
+                display: inline-block; /* Para que el text-align:center funcione bien con múltiples líneas */
             }
 
             .step-indicator-vertical .step.active {
