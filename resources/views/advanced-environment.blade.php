@@ -7,14 +7,32 @@
 @section('description', 'Configure los detalles básicos de su aplicación y el envío de correo')
 
 @section('steps')
-<div class="step-indicator">
-    <div class="step completed"><i class="fas fa-check"></i></div>
-    <div class="step completed"><i class="fas fa-check"></i></div>
-    <div class="step completed"><i class="fas fa-check"></i></div>
-    <div class="step active">4</div>
-    <div class="step">5</div>
-    <div class="step">6</div>
-</div>
+<ul class="step-indicator-vertical">
+    <li class="step completed">
+        <span class="step-number"><i class="fas fa-check"></i></span>
+        <span class="step-label">Requisitos</span>
+    </li>
+    <li class="step completed">
+        <span class="step-number"><i class="fas fa-check"></i></span>
+        <span class="step-label">Base de Datos</span>
+    </li>
+    <li class="step completed">
+        <span class="step-number"><i class="fas fa-check"></i></span>
+        <span class="step-label">Migraciones</span>
+    </li>
+    <li class="step active">
+        <span class="step-number">4</span>
+        <span class="step-label">Entorno</span>
+    </li>
+    <li class="step">
+        <span class="step-number">5</span>
+        <span class="step-label">Configuración Final</span>
+    </li>
+    <li class="step">
+        <span class="step-number">6</span>
+        <span class="step-label">Instalación</span>
+    </li>
+</ul>
 @endsection
 
 @section('content')

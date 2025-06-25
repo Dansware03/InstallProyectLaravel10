@@ -7,14 +7,32 @@
 @section('description', 'Por favor espere mientras configuramos su aplicación con sus ajustes personalizados')
 
 @section('steps')
-    <div class="step-indicator">
-        <div class="step completed"><i class="fas fa-check"></i></div>
-        <div class="step completed"><i class="fas fa-check"></i></div>
-        <div class="step completed"><i class="fas fa-check"></i></div>
-        <div class="step completed"><i class="fas fa-check"></i></div>
-        <div class="step completed"><i class="fas fa-check"></i></div>
-        <div class="step active">6</div>
-    </div>
+<ul class="step-indicator-vertical">
+    <li class="step completed">
+        <span class="step-number"><i class="fas fa-check"></i></span>
+        <span class="step-label">Requisitos</span>
+    </li>
+    <li class="step completed">
+        <span class="step-number"><i class="fas fa-check"></i></span>
+        <span class="step-label">Base de Datos</span>
+    </li>
+    <li class="step completed">
+        <span class="step-number"><i class="fas fa-check"></i></span>
+        <span class="step-label">Migraciones</span>
+    </li>
+    <li class="step completed">
+        <span class="step-number"><i class="fas fa-check"></i></span>
+        <span class="step-label">Entorno</span>
+    </li>
+    <li class="step completed">
+        <span class="step-number"><i class="fas fa-check"></i></span>
+        <span class="step-label">Configuración Final</span>
+    </li>
+    <li class="step active">
+        <span class="step-number">6</span>
+        <span class="step-label">Instalación</span>
+    </li>
+</ul>
 @endsection
 
 @section('content')
@@ -23,10 +41,10 @@
         <i class="fas fa-cogs fa-spin" style="font-size: 4rem; color: #FF512F;"></i>
     </div>
 
-    <h3 class="mb-4">Configurando su aplicación...</h3>
+    <h4 class="mb-4 text-primary"><i class="fas fa-spinner fa-spin me-2"></i>Configurando su aplicación...</h4>
 
-    <div class="progress mb-4" style="height: 30px;">
-        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+    <div class="progress mb-4" style="height: 26px;">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%; font-size: 0.8rem;"></div>
     </div>
 
     <div id="installation-status" class="mb-4">

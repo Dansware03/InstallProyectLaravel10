@@ -7,14 +7,32 @@
 @section('description', 'Comprobando los requisitos del sistema para la instalación avanzada')
 
 @section('steps')
-<div class="step-indicator">
-    <div class="step active">1</div>
-    <div class="step">2</div>
-    <div class="step">3</div>
-    <div class="step">4</div>
-    <div class="step">5</div>
-    <div class="step">6</div>
-</div>
+<ul class="step-indicator-vertical">
+    <li class="step active">
+        <span class="step-number">1</span>
+        <span class="step-label">Requisitos</span>
+    </li>
+    <li class="step">
+        <span class="step-number">2</span>
+        <span class="step-label">Base de Datos</span>
+    </li>
+    <li class="step">
+        <span class="step-number">3</span>
+        <span class="step-label">Migraciones</span>
+    </li>
+    <li class="step">
+        <span class="step-number">4</span>
+        <span class="step-label">Entorno</span>
+    </li>
+    <li class="step">
+        <span class="step-number">5</span>
+        <span class="step-label">Configuración Final</span>
+    </li>
+    <li class="step">
+        <span class="step-number">6</span>
+        <span class="step-label">Instalación</span>
+    </li>
+</ul>
 @endsection
 
 @section('content')

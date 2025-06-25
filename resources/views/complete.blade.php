@@ -12,9 +12,9 @@
         <i class="fas fa-check-circle fa-4x text-success"></i>
     </div>
 
-    <h3 class="mb-3">¡Felicidades!</h3>
+    {{-- Título h3 eliminado, ya que @yield('header') lo maneja ahora --}}
 
-    <p class="lead mb-4">
+    <p class="lead mb-4 mt-3">
         Su aplicación Laravel ha sido instalada y configurada correctamente.
         Ya puede comenzar a utilizarla.
     </p>

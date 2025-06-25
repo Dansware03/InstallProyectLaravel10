@@ -172,46 +172,205 @@
     </style>
     
     @stack('styles')
+    <style>
+        /* Estilos adicionales para el layout horizontal */
+        .installer-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .installer-sidebar {
+            width: 300px; /* Ancho fijo para la barra lateral */
+            background-color: #f8f9fa; /* Un color claro para la barra lateral */
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed; /* Sidebar fija */
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .installer-sidebar .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #FF512F; /* Color principal del header anterior */
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .installer-content-area {
+            flex-grow: 1;
+            padding: 30px 40px;
+            background-color: #ffffff; /* Fondo blanco para el área de contenido */
+            margin-left: 300px; /* Mismo ancho que la sidebar */
+            overflow-y: auto; /* Permitir scroll si el contenido es largo */
+        }
+
+        /* Estilos para el indicador de pasos vertical (se adaptarán en el siguiente paso) */
+        .step-indicator-vertical {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 20px;
+        }
+        .step-indicator-vertical .step {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background-color: #e9ecef;
+            color: #6c757d;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-left: 5px solid transparent;
+        }
+        .step-indicator-vertical .step .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+            background-color: #adb5bd;
+            color: white;
+        }
+        .step-indicator-vertical .step .step-label {
+            flex-grow: 1;
+        }
+
+        .step-indicator-vertical .step.active {
+            background-color: #ffe8e0; /* Naranja claro */
+            color: #FF512F;
+            border-left-color: #FF512F;
+        }
+        .step-indicator-vertical .step.active .step-number {
+            background-color: #FF512F;
+        }
+        .step-indicator-vertical .step.completed {
+            background-color: #e6f7ee; /* Verde claro */
+            color: #28a745;
+            border-left-color: #28a745;
+        }
+        .step-indicator-vertical .step.completed .step-number {
+            background-color: #28a745;
+        }
+        .installer-main-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .installer-main-header h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+         .installer-main-header p {
+            font-size: 0.95rem;
+            color: #6c757d;
+        }
+
+        /* Responsive: colapsar sidebar en pantallas pequeñas */
+        @media (max-width: 768px) {
+            .installer-sidebar {
+                width: 100%;
+                height: auto;
+                position: static; /* Cambiar a estático para apilar */
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                padding-bottom: 10px;
+            }
+            .installer-sidebar .logo {
+                margin-bottom: 15px;
+                padding-bottom: 15px;
+                font-size: 1.25rem;
+            }
+            .installer-content-area {
+                margin-left: 0;
+                padding: 20px;
+            }
+            .step-indicator-vertical { /* Convertir a horizontal en móvil */
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-top: 10px;
+            }
+            .step-indicator-vertical .step {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                padding: 8px;
+                margin: 5px;
+                border-left: none;
+                border-bottom: 3px solid transparent;
+                min-width: 70px; /* Ancho mínimo para cada paso */
+            }
+            .step-indicator-vertical .step .step-number {
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
+             .step-indicator-vertical .step.active {
+                border-bottom-color: #FF512F;
+            }
+            .step-indicator-vertical .step.completed {
+                border-bottom-color: #28a745;
+            }
+            .installer-main-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+    </style>
 </head>
 <body>
-    <div class="installer-container">
-        <div class="installer-card">
-            <div class="installer-header">
-                <h1 class="mb-2">@yield('header', 'Laravel Installer')</h1>
-                <p class="mb-0 opacity-75">@yield('description', 'Asistente de instalación para Laravel')</p>
-                @yield('steps')
+    <div class="installer-wrapper">
+        <aside class="installer-sidebar">
+            <div class="logo">
+                <i class="fas fa-rocket"></i> Laravel Installer
             </div>
+            @yield('steps') <!-- Aquí irá el nuevo indicador de pasos vertical -->
+        </aside>
+
+        <main class="installer-content-area">
+            <div class="installer-main-header">
+                 <h1>@yield('header', 'Proceso de Instalación')</h1>
+                 <p>@yield('description', 'Siga los pasos para configurar su aplicación.')</p>
+            </div>
+
+            @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h5 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Se encontraron errores:</h5>
+                    <ul class="mb-0 small">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>{{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
             
-            <div class="installer-body">
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        <strong>Se encontraron los siguientes errores:</strong>
-                        <ul class="mb-0 mt-2">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-                
-                @if (session('success'))
-                    <div class="alert alert-success">
-                        <i class="fas fa-check-circle me-2"></i>
-                        {{ session('success') }}
-                    </div>
-                @endif
-                
-                @if (session('error'))
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        {{ session('error') }}
-                    </div>
-                @endif
-                
-                @yield('content')
+            <div class="content-body mt-3">
+                 @yield('content')
             </div>
-        </div>
+        </main>
     </div>
     
     <!-- Bootstrap 5 JS -->

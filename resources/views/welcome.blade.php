@@ -7,15 +7,15 @@
 @section('description', 'Seleccione el tipo de instalación que desea realizar')
 
 @section('content')
-<div class="text-center">
+<div class="text-center pt-2">
     <div class="mb-4">
-        <i class="fas fa-rocket" style="font-size: 4rem; color: #FF512F;"></i>
+        <i class="fas fa-cogs" style="font-size: 4rem; color: #FF512F;"></i>
     </div>
     
-    <h3 class="mb-4">¡Bienvenido al Asistente de Instalación!</h3>
+    {{-- Título h3 eliminado, ya que @yield('header') lo maneja ahora --}}
     
     <p class="lead mb-5">
-        Este asistente le ayudará a configurar su aplicación Laravel de manera rápida y segura.
+        Este asistente le ayudará a configurar su aplicación Laravel de manera rápida y segura.<br>
         Seleccione una de las siguientes opciones para comenzar:
     </p>
     
