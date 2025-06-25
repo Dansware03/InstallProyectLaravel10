@@ -142,9 +142,47 @@ class InstallerManager
     public function runMigrations(): bool
     {
         try {
-            Artisan::call('migrate', ['--force' => true]);
-            return true;
-        } catch (\Exception $e) {
+            // Clear config cache to ensure fresh database connection details from .env are used
+            Artisan::call('config:clear');
+            \Log::info('Installer: Cleared config cache before running migrations.');
+
+            // It's good practice to refresh the application's database connection
+            // as .env might have just been updated.
+            // Flushing and reconnecting the default connection.
+            DB::purge(config('database.default'));
+            DB::reconnect(config('database.default'));
+            \Log::info('Installer: Database connection purged and reconnected.');
+
+
+            $exitCode = Artisan::call('migrate', [
+                '--force' => true,
+                // '--path' => 'database/migrations', // Opcional: especificar la ruta si es necesario
+                // '--database' => config('database.default') // Opcional: especificar la conexión
+            ]);
+
+            if ($exitCode === 0) {
+                \Log::info('Installer: Migrations executed successfully (exit code 0).');
+                return true;
+            } else {
+                $output = '';
+                // Try to get output if available (Kernel contract might be needed)
+                // For simplicity, just logging the exit code. Detailed output might require more setup.
+                // if (app() instanceof \Illuminate\Contracts\Console\Kernel) {
+                //     $output = app('Illuminate\Contracts\Console\Kernel')->output();
+                // }
+                \Log::error('Installer: Migrations command failed.', [
+                    'exit_code' => $exitCode,
+                    // 'output' => $output // Uncomment if output retrieval is implemented
+                ]);
+                return false;
+            }
+        } catch (\Throwable $e) { // Catch Throwable for broader error capturing
+            \Log::error('Installer: Exception during runMigrations.', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return false;
         }
     }

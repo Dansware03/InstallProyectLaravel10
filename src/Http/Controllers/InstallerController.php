@@ -239,6 +239,9 @@ class InstallerController extends Controller
             }
 
             session(['installer.migrations_run' => true]);
+        } else {
+            // Asegurarse de que si el usuario desmarca la opción, la sesión lo refleje.
+            session(['installer.migrations_run' => false]);
         }
 
         return redirect()->route('installer.advanced.environment');
