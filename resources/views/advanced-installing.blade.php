@@ -119,31 +119,38 @@
             const errorSection = document.getElementById('installation-error');
             const adminEmailField = document.getElementById('admin-email');
             const adminPasswordField = document.getElementById('admin-password');
+            const credentialsCard = document.querySelector('#installation-complete .card');
 
             let currentStepIndex = 0;
+            // Dinámicamente construir los pasos basados en la configuración de sesión
             const processSteps = [
-                { text: 'Actualizando archivo .env con configuraciones de entorno...', progress: 20 },
-                { text: 'Aplicando configuraciones de tipo de entorno (desarrollo/producción)...', progress: 40 },
-                @if(session('installer.final_config.disable_api'))
-                { text: 'Deshabilitando rutas de API...', progress: 50 },
-                @endif
-                @if(session('installer.migrations_run'))
-                { text: 'Creando usuario administrador...', progress: 70 },
-                @endif
-                { text: 'Marcando instalación como completada...', progress: 90 },
-                { text: 'Limpiando datos de sesión del instalador...', progress: 95 },
-                { text: 'Finalizando instalación...', progress: 100 }
+                { text: 'Actualizando archivo .env con configuraciones de entorno...', progress: 20, active: true },
+                { text: 'Aplicando configuraciones de tipo de entorno (desarrollo/producción)...', progress: 40, active: true },
             ];
 
+            @if(session('installer.final_config.disable_api'))
+            processSteps.push({ text: 'Deshabilitando rutas de API...', progress: 50, active: true });
+            @endif
+
+            @if(session('installer.migrations_run'))
+            processSteps.push({ text: 'Creando usuario administrador...', progress: 70, active: true });
+            @endif
+
+            processSteps.push({ text: 'Marcando instalación como completada...', progress: 90, active: true });
+            processSteps.push({ text: 'Limpiando datos de sesión del instalador...', progress: 95, active: true });
+            processSteps.push({ text: 'Finalizando instalación...', progress: 100, active: true });
+
+            const activeProcessSteps = processSteps.filter(step => step.active);
+
             function updateDisplay() {
-                if (currentStepIndex < processSteps.length) {
-                    const step = processSteps[currentStepIndex];
+                if (currentStepIndex < activeProcessSteps.length) {
+                    const step = activeProcessSteps[currentStepIndex];
                     progressBar.style.width = step.progress + '%';
                     statusElement.innerHTML = `<p class="lead">${step.text}</p>`;
 
                     // Actualizar la lista de pasos
                     let stepsHtml = '';
-                    processSteps.forEach((s, index) => {
+                    activeProcessSteps.forEach((s, index) => {
                         if (index < currentStepIndex) {
                             stepsHtml += `<div class="installation-step text-success"><i class="fas fa-check me-2"></i><s>${s.text}</s></div>`;
                         } else if (index === currentStepIndex) {
@@ -155,7 +162,7 @@
                     stepsDisplayContainer.innerHTML = stepsHtml;
 
                     currentStepIndex++;
-                    if (currentStepIndex < processSteps.length) {
+                    if (currentStepIndex < activeProcessSteps.length) {
                         setTimeout(updateDisplay, 1000 + Math.random() * 500); // Simular tiempo
                     } else {
                         executeActualInstallation();
@@ -183,12 +190,11 @@
                         statusElement.innerHTML = '<p class="lead text-success">¡Instalación Avanzada Completada!</p>';
                         stepsDisplayContainer.style.display = 'none';
 
-                        if (data.credentials && adminEmailField && adminPasswordField) {
+                        if (data.credentials && data.credentials.email && data.credentials.password && adminEmailField && adminPasswordField) {
                             adminEmailField.value = data.credentials.email;
                             adminPasswordField.value = data.credentials.password;
+                            if(credentialsCard) credentialsCard.style.display = 'block';
                         } else {
-                             // Ocultar la tarjeta de credenciales si no hay credenciales
-                            const credentialsCard = document.querySelector('#installation-complete .card');
                             if(credentialsCard) credentialsCard.style.display = 'none';
                         }
                         completeSection.style.display = 'block';

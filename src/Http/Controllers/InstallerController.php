@@ -266,6 +266,16 @@ class InstallerController extends Controller
             $envConfig['MAIL_USERNAME'] = $request->mail_username;
             $envConfig['MAIL_PASSWORD'] = $request->mail_password;
             $envConfig['MAIL_ENCRYPTION'] = $request->mail_encryption;
+            // Añadir MAIL_FROM_ADDRESS y MAIL_FROM_NAME si se proporcionan
+            if ($request->filled('mail_from_address')) {
+                $envConfig['MAIL_FROM_ADDRESS'] = $request->mail_from_address;
+            }
+            // Por defecto, usar el nombre de la aplicación como MAIL_FROM_NAME si no se proporciona uno específico
+            // y si se ha configurado un nombre de aplicación.
+            $appName = $request->filled('app_name') ? $request->app_name : config('app.name');
+            if ($appName) {
+                 $envConfig['MAIL_FROM_NAME'] = '"' . $appName . '"';
+            }
         }
 
         session(['installer.environment' => $envConfig]);
