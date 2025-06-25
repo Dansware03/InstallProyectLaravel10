@@ -268,25 +268,39 @@ class InstallerController extends Controller
         $envConfig = [];
 
         if ($request->filled('app_name')) {
-            $envConfig['APP_NAME'] = '"' . $request->app_name . '"';
+            $envConfig['APP_NAME'] = $this->prepareEnvValue($request->app_name);
         }
 
+        // Preparar MAIL_FROM_NAME primero, ya que puede depender de app_name
+        $mailFromName = null;
+        if ($request->filled('app_name')) {
+            $mailFromName = $request->app_name;
+        } elseif (config('app.name') && config('app.name') !== 'Laravel') {
+            // Usar el config('app.name') actual solo si es significativo (no el default 'Laravel')
+            // y no se proporcionó un app_name en el request.
+            $mailFromName = config('app.name');
+        }
+        // Si el usuario provee un MAIL_FROM_NAME específico en el formulario (no implementado actualmente pero por si acaso)
+        // if ($request->filled('mail_from_name_input')) {
+        //    $mailFromName = $request->mail_from_name_input;
+        // }
+
+
         if ($request->filled('mail_driver')) {
-            $envConfig['MAIL_MAILER'] = $request->mail_driver;
-            $envConfig['MAIL_HOST'] = $request->mail_host;
-            $envConfig['MAIL_PORT'] = $request->mail_port;
-            $envConfig['MAIL_USERNAME'] = $request->mail_username;
-            $envConfig['MAIL_PASSWORD'] = $request->mail_password;
-            $envConfig['MAIL_ENCRYPTION'] = $request->mail_encryption;
-            // Añadir MAIL_FROM_ADDRESS y MAIL_FROM_NAME si se proporcionan
+            $envConfig['MAIL_MAILER'] = $this->prepareEnvValue($request->mail_driver);
+            $envConfig['MAIL_HOST'] = $this->prepareEnvValue($request->mail_host);
+            $envConfig['MAIL_PORT'] = $this->prepareEnvValue($request->mail_port);
+            $envConfig['MAIL_USERNAME'] = $this->prepareEnvValue($request->mail_username);
+            $envConfig['MAIL_PASSWORD'] = $this->prepareEnvValue($request->mail_password); // Las contraseñas pueden tener caracteres especiales
+            $envConfig['MAIL_ENCRYPTION'] = $this->prepareEnvValue($request->mail_encryption);
+
             if ($request->filled('mail_from_address')) {
-                $envConfig['MAIL_FROM_ADDRESS'] = $request->mail_from_address;
+                $envConfig['MAIL_FROM_ADDRESS'] = $this->prepareEnvValue($request->mail_from_address);
             }
-            // Por defecto, usar el nombre de la aplicación como MAIL_FROM_NAME si no se proporciona uno específico
-            // y si se ha configurado un nombre de aplicación.
-            $appName = $request->filled('app_name') ? $request->app_name : config('app.name');
-            if ($appName) {
-                 $envConfig['MAIL_FROM_NAME'] = '"' . $appName . '"';
+
+            // Usar el $mailFromName determinado anteriormente
+            if ($mailFromName) {
+                 $envConfig['MAIL_FROM_NAME'] = $this->prepareEnvValue($mailFromName);
             }
         }
 
@@ -402,5 +416,43 @@ class InstallerController extends Controller
         }
 
         return view('installer::complete');
+    }
+
+    /**
+     * Prepara un valor para ser escrito en el archivo .env, añadiendo comillas si es necesario.
+     */
+    private function prepareEnvValue($value): string
+    {
+        // Si el valor está vacío o es nulo, devolver una cadena vacía para el .env
+        // (esto efectivamente "borrará" la variable si se escribe como KEY=)
+        // o se puede optar por no añadir la clave al array $envConfig si el valor es nulo/vacío.
+        // Por ahora, si es null, devolvemos string vacío. Si es string vacío, se queda así.
+        if (is_null($value)) {
+            return '';
+        }
+
+        $value = (string) $value; // Asegurar que sea string
+
+        // Si el valor ya está correctamente entrecomillado (simple o doble)
+        if ((str_starts_with($value, '"') && str_ends_with($value, '"')) ||
+            (str_starts_with($value, "'") && str_ends_with($value, "'"))) {
+            return $value;
+        }
+
+        // Si el valor contiene espacios, $, #, =, o comillas (simples o dobles) en su interior,
+        // o si está vacío y queremos representarlo como KEY="", entonces lo encerramos entre comillas dobles.
+        // Un valor vacío sin comillas (KEY=) es válido en .env para significar "nulo" o vacío.
+        // Si queremos un string vacío literal, es KEY="".
+        // Aquí, si $value es un string vacío después del casteo, lo dejamos como está.
+        // Solo añadimos comillas si hay caracteres problemáticos o espacios.
+        if (preg_match('/\\s|\\$|#|=|"|\'/', $value)) {
+            // Escapar comillas dobles internas y backslashes antes de encerrar
+            $value = str_replace('\\', '\\\\', $value);
+            $value = str_replace('"', '\\"', $value);
+            return '"' . $value . '"';
+        }
+
+        // Para valores simples sin espacios ni caracteres problemáticos, no se requieren comillas.
+        return $value;
     }
 }
