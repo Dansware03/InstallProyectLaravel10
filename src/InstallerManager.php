@@ -151,26 +151,34 @@ class InstallerManager
             // Flushing and reconnecting the default connection.
             DB::purge(config('database.default'));
             DB::reconnect(config('database.default'));
-            \Log::info('Installer: Database connection purged and reconnected.');
-
+            $dbNameBeforeMigrate = DB::connection(config('database.default'))->getDatabaseName();
+            \Log::info('Installer: Database connection purged and reconnected. DB name before migrate: ' . $dbNameBeforeMigrate);
 
             $exitCode = Artisan::call('migrate', [
                 '--force' => true,
             ]);
 
+            $dbNameAfterMigrate = DB::connection(config('database.default'))->getDatabaseName();
+            \Log::info('Installer: Artisan migrate command finished. DB name after migrate: ' . $dbNameAfterMigrate);
+
             if ($exitCode === 0) {
-                \Log::info('Installer: Artisan migrate command executed successfully (exit code 0).');
+                \Log::info('Installer: Artisan migrate command reported success (exit code 0).');
+
                 // Verificar explícitamente si la tabla 'users' existe después de las migraciones
-                if (\Illuminate\Support\Facades\Schema::hasTable('users')) {
-                    \Log::info('Installer: Table "users" exists after migration.');
+                // usando la conexión por defecto explícitamente.
+                $usersTableExists = \Illuminate\Support\Facades\Schema::connection(config('database.default'))->hasTable('users');
+
+                if ($usersTableExists) {
+                    \Log::info('Installer: Schema::hasTable("users") confirmed table exists after migration on DB: ' . $dbNameAfterMigrate);
                     return true;
                 } else {
-                    \Log::error('Installer: Table "users" DOES NOT exist after Artisan migrate command (exit code 0). This is unexpected.');
+                    \Log::error('Installer: Schema::hasTable("users") reports table DOES NOT exist after Artisan migrate success (exit code 0) on DB: ' . $dbNameAfterMigrate . '. This is highly unexpected.');
                     return false;
                 }
             } else {
                 \Log::error('Installer: Artisan migrate command failed.', [
                     'exit_code' => $exitCode,
+                    'db_name_at_failure' => $dbNameAfterMigrate
                 ]);
                 return false;
             }
@@ -190,19 +198,47 @@ class InstallerManager
      */
     public function createAdminUser(): array
     {
+        // Forzar reconexión y loguear DB name justo antes de la operación de Eloquent
+        try {
+            DB::purge(config('database.default'));
+            DB::reconnect(config('database.default'));
+            $dbName = DB::connection(config('database.default'))->getDatabaseName();
+            \Log::info('Installer: DB purged and reconnected before createAdminUser. Current DB: ' . $dbName);
+        } catch (\Throwable $e) {
+            \Log::error('Installer: Failed to purge/reconnect DB in createAdminUser.', ['error' => $e->getMessage()]);
+            // Continuar de todas formas, ya que la conexión podría estar bien, pero loguear el intento fallido.
+        }
+
         $config = config('installer.default_user');
 
-        $user = \App\Models\User::create([
-            'name' => $config['name'],
-            'email' => $config['email'],
-            'password' => Hash::make($config['password']),
-            'email_verified_at' => now(),
-        ]);
+        // Loguear antes de intentar crear el usuario
+        \Log::info('Installer: Attempting to create admin user.', ['email' => $config['email'], 'name' => $config['name']]);
 
-        return [
-            'email' => $config['email'],
-            'password' => $config['password'],
-        ];
+        try {
+            $user = \App\Models\User::create([
+                'name' => $config['name'],
+                'email' => $config['email'],
+                'password' => Hash::make($config['password']),
+                'email_verified_at' => now(), // Asegurar que el usuario esté verificado
+            ]);
+
+            \Log::info('Installer: Admin user created successfully.', ['user_id' => $user->id]);
+
+            return [
+                'email' => $config['email'],
+                'password' => $config['password'], // Devolver la contraseña en texto plano para mostrarla al usuario
+            ];
+        } catch (\Throwable $e) {
+            \Log::error('Installer: Failed to create admin user.', [
+                'error' => $e->getMessage(),
+                'db_name' => DB::connection(config('database.default'))->getDatabaseName(), // Loguear sobre qué BD falló
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            // Re-lanzar la excepción para que sea manejada por el bloque try/catch del controlador
+            // y se devuelva una respuesta JSON de error al frontend.
+            throw $e;
+        }
     }
 
     /**
