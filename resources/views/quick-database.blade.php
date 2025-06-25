@@ -66,27 +66,31 @@
                value="{{ old('database_username') }}" required>
     </div>
     
-    <div class="mb-4">
+    <div class="mb-3">
         <label for="database_password" class="form-label">
             <i class="fas fa-lock me-1"></i>Contraseña
         </label>
         <input type="password" class="form-control" id="database_password" name="database_password" 
                value="{{ old('database_password') }}">
-        <div class="form-text">Deje en blanco si no tiene contraseña</div>
+        <div class="form-text">Deje en blanco si no tiene contraseña.</div>
     </div>
     
-    <div class="alert alert-info">
-        <i class="fas fa-info-circle me-2"></i>
-        <strong>Información:</strong> La instalación rápida configurará automáticamente:
-        <ul class="mb-0 mt-2">
-            <li>Configuraciones de seguridad para producción</li>
-            <li>Optimizaciones de rendimiento</li>
-            <li>Usuario administrador con credenciales temporales</li>
-            <li>Ejecución de migraciones de base de datos</li>
-        </ul>
+    <div class="alert alert-info mt-4">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-info-circle fa-2x me-3"></i>
+            <div>
+                <strong class="d-block mb-1">La instalación rápida configurará automáticamente:</strong>
+                <ul class="list-unstyled mb-0 small">
+                    <li><i class="fas fa-shield-alt me-1 text-primary"></i>Configuraciones de seguridad para producción.</li>
+                    <li><i class="fas fa-tachometer-alt me-1 text-primary"></i>Optimizaciones de rendimiento.</li>
+                    <li><i class="fas fa-user-shield me-1 text-primary"></i>Usuario administrador con credenciales temporales.</li>
+                    <li><i class="fas fa-database me-1 text-primary"></i>Ejecución de migraciones de base de datos.</li>
+                </ul>
+            </div>
+        </div>
     </div>
     
-    <div class="d-flex justify-content-between">
+    <div class="d-flex justify-content-between mt-5">
         <a href="{{ route('installer.welcome') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left me-2"></i>Volver
         </a>

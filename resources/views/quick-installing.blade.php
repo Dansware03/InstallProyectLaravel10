@@ -37,62 +37,61 @@
         </div>
     </div>
 
-    <div id="installation-complete" style="display: none;">
-        <div class="alert alert-success">
-            <i class="fas fa-check-circle me-2"></i>
+    <div id="installation-complete" style="display: none;" class="mt-4">
+        <div class="alert alert-success py-3">
+            <i class="fas fa-check-circle fa-lg me-2"></i>
             <strong>¡Instalación completada exitosamente!</strong>
         </div>
 
-        <div class="card">
+        <div class="card mt-4">
             <div class="card-header">
-                <h5><i class="fas fa-key me-2"></i>Credenciales de Acceso</h5>
+                <h5 class="mb-0"><i class="fas fa-key me-2"></i>Credenciales de Acceso</h5>
             </div>
-            <div class="card-body">
-                <div class="row">
+            <div class="card-body p-4">
+                <div class="row gy-3">
                     <div class="col-md-6">
-                        <strong>Email:</strong>
-                        <div class="input-group mt-1">
-                            <input type="text" class="form-control" id="admin-email" readonly>
-                            <button class="btn btn-outline-secondary" type="button"
+                        <label for="admin-email" class="form-label small text-muted">Email:</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-sm" id="admin-email" readonly>
+                            <button class="btn btn-outline-secondary btn-sm" type="button"
                                 onclick="copyToClipboard('admin-email', this)">
                                 <i class="fas fa-copy"></i>
                             </button>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <strong>Contraseña:</strong>
-                        <div class="input-group mt-1">
-                            <input type="text" class="form-control" id="admin-password" readonly>
-                            <button class="btn btn-outline-secondary" type="button"
+                        <label for="admin-password" class="form-label small text-muted">Contraseña:</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-sm" id="admin-password" readonly>
+                            <button class="btn btn-outline-secondary btn-sm" type="button"
                                 onclick="copyToClipboard('admin-password', this)">
                                 <i class="fas fa-copy"></i>
                             </button>
                         </div>
                     </div>
                 </div>
-                <div class="alert alert-warning mt-3">
+                <div class="alert alert-warning mt-4 py-2 px-3 small">
                     <i class="fas fa-exclamation-triangle me-2"></i>
-                    <strong>Importante:</strong> Guarde estas credenciales en un lugar seguro.
-                    Se recomienda cambiar la contraseña después del primer acceso.
+                    <strong>Importante:</strong> Guarde estas credenciales. Se recomienda cambiar la contraseña después del primer acceso.
                 </div>
             </div>
         </div>
 
-        <div class="mt-4">
+        <div class="mt-4 pt-2 text-center">
             <a href="/login" class="btn btn-primary btn-lg">
                 <i class="fas fa-sign-in-alt me-2"></i>Ir al Login
             </a>
         </div>
     </div>
 
-    <div id="installation-error" style="display: none;">
-        <div class="alert alert-danger">
-            <i class="fas fa-exclamation-triangle me-2"></i>
+    <div id="installation-error" style="display: none;" class="mt-4">
+        <div class="alert alert-danger py-3">
+            <i class="fas fa-exclamation-triangle fa-lg me-2"></i>
             <strong>Error durante la instalación:</strong>
-            <div id="error-message"></div>
+            <div id="error-message" class="mt-1 small"></div>
         </div>
 
-        <div class="mt-4">
+        <div class="mt-4 pt-2 text-center">
             <a href="{{ route('installer.welcome') }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left me-2"></i>Volver al Inicio
             </a>

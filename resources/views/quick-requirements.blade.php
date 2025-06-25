@@ -13,71 +13,63 @@
     Debe resolverlos antes de continuar con la instalación.
 </div>
 
-<div class="mb-4">
-    <h4><i class="fas fa-server me-2"></i>Versión de PHP</h4>
-    <div class="requirement-item {{ $requirements['php_version']['satisfied'] ? 'success' : 'error' }}">
-        <div class="me-3">
-            @if($requirements['php_version']['satisfied'])
-                <i class="fas fa-check-circle text-success"></i>
-            @else
-                <i class="fas fa-times-circle text-danger"></i>
-            @endif
-        </div>
-        <div class="flex-grow-1">
-            <strong>Versión de PHP:</strong> {{ $requirements['php_version']['current'] }}
-            <small class="text-muted d-block">Requerida: {{ $requirements['php_version']['required'] }} o superior</small>
-        </div>
-    </div>
-</div>
+<h4 class="mb-3 mt-4"><i class="fas fa-server me-2"></i>Versión de PHP</h4>
+<ul class="list-group mb-4">
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>
+            <i class="fas {{ $requirements['php_version']['satisfied'] ? 'fa-check-circle text-success' : 'fa-times-circle text-danger' }} me-2"></i>
+            PHP {{ $requirements['php_version']['required'] }} o superior
+            <small class="text-muted d-block ms-4 ps-1">Actual: {{ $requirements['php_version']['current'] }}</small>
+        </span>
+        @if ($requirements['php_version']['satisfied'])
+            <span class="badge bg-success rounded-pill"><i class="fas fa-check"></i> Cumplido</span>
+        @else
+            <span class="badge bg-danger rounded-pill"><i class="fas fa-times"></i> No Cumplido</span>
+        @endif
+    </li>
+</ul>
 
-<div class="mb-4">
-    <h4><i class="fas fa-puzzle-piece me-2"></i>Extensiones de PHP</h4>
+<h4 class="mb-3"><i class="fas fa-puzzle-piece me-2"></i>Extensiones de PHP</h4>
+<ul class="list-group mb-4">
     @foreach($requirements['php_extensions'] as $extension => $status)
-        <div class="requirement-item {{ $status['installed'] ? 'success' : 'error' }}">
-            <div class="me-3">
-                @if($status['installed'])
-                    <i class="fas fa-check-circle text-success"></i>
-                @else
-                    <i class="fas fa-times-circle text-danger"></i>
-                @endif
-            </div>
-            <div class="flex-grow-1">
-                <strong>{{ $extension }}</strong>
-                @if(!$status['installed'])
-                    <small class="text-danger d-block">Esta extensión debe ser instalada y habilitada</small>
-                @endif
-            </div>
-        </div>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>
+                <i class="fas {{ $status['installed'] ? 'fa-check-circle text-success' : 'fa-times-circle text-danger' }} me-2"></i>
+                Extensión {{ $extension }}
+            </span>
+            @if ($status['installed'])
+                <span class="badge bg-success rounded-pill"><i class="fas fa-check"></i> Instalada</span>
+            @else
+                <span class="badge bg-danger rounded-pill"><i class="fas fa-times"></i> No Instalada</span>
+            @endif
+        </li>
     @endforeach
-</div>
+</ul>
 
-<div class="mb-4">
-    <h4><i class="fas fa-folder me-2"></i>Permisos de Directorios</h4>
+<h4 class="mb-3"><i class="fas fa-folder-open me-2"></i>Permisos de Directorio</h4>
+<ul class="list-group mb-4">
     @foreach($requirements['permissions'] as $path => $status)
-        <div class="requirement-item {{ $status['satisfied'] ? 'success' : 'error' }}">
-            <div class="me-3">
-                @if($status['satisfied'])
-                    <i class="fas fa-check-circle text-success"></i>
-                @else
-                    <i class="fas fa-times-circle text-danger"></i>
-                @endif
-            </div>
-            <div class="flex-grow-1">
-                <strong>{{ $path }}</strong>
-                <small class="text-muted d-block">
-                    Actual: {{ $status['current'] }} | Requerido: {{ $status['required'] }}
-                </small>
-                @if(!$status['satisfied'])
-                    <small class="text-danger d-block">
-                        Ejecute: <code>chmod -R {{ $status['required'] }} {{ $path }}</code>
-                    </small>
-                @endif
-            </div>
-        </div>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>
+                <i class="fas {{ $status['satisfied'] ? 'fa-check-circle text-success' : 'fa-times-circle text-danger' }} me-2"></i>
+                Permisos para <code>{{ $path }}</code>
+                 <small class="text-muted d-block ms-4 ps-1">Requerido: {{ $status['required'] }} (Actual: {{ $status['current'] }})</small>
+            </span>
+            @if ($status['satisfied'])
+                <span class="badge bg-success rounded-pill"><i class="fas fa-check"></i> Correctos</span>
+            @else
+                <span class="badge bg-danger rounded-pill"><i class="fas fa-times"></i> Incorrectos</span>
+            @endif
+        </li>
+        @if (!$status['satisfied'])
+        <li class="list-group-item list-group-item-warning py-2">
+            <small><i class="fas fa-info-circle me-1"></i>Ejecute: <code>chmod -R {{ $status['required'] }} {{ base_path($path) }}</code></small>
+        </li>
+        @endif
     @endforeach
-</div>
+</ul>
 
-<div class="alert alert-info">
+<div class="alert alert-info mt-4">
     <i class="fas fa-lightbulb me-2"></i>
     <strong>Ayuda:</strong> Contacte con su administrador de sistemas o proveedor de hosting 
     para resolver estos requisitos. Una vez resueltos, recargue esta página para continuar.

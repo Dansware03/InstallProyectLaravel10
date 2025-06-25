@@ -33,7 +33,7 @@
             backdrop-filter: blur(10px);
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
+            max-width: 860px; /* Aumentado ligeramente */
             width: 100%;
         }
         
@@ -160,6 +160,14 @@
         .progress-bar {
             border-radius: 15px;
             background: linear-gradient(135deg, #FF512F 0%, #F09819 100%);
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0));
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
         }
     </style>
     

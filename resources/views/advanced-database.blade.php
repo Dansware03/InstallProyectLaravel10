@@ -86,13 +86,12 @@
         <div class="form-text">Deje en blanco si no tiene contraseña.</div>
     </div>
 
-    <div class="alert alert-info">
+    <div class="alert alert-info mt-4">
         <i class="fas fa-info-circle me-2"></i>
-        Se intentará establecer una conexión para verificar los datos proporcionados.
-        Esta información se guardará temporalmente para los siguientes pasos.
+        Se intentará establecer una conexión para verificar los datos proporcionados. Esta información se guardará temporalmente para los siguientes pasos.
     </div>
 
-    <div class="d-flex justify-content-between mt-4">
+    <div class="d-flex justify-content-between mt-5">
         <a href="{{ route('installer.advanced.requirements') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left me-2"></i>Anterior
         </a>
