@@ -145,8 +145,12 @@ class InstallerController extends Controller
                 'credentials' => $credentials
             ]);
 
-        } catch (\Exception $e) {
-            \Log::error('Installation error: ' . $e->getMessage());
+        } catch (\Throwable $e) { // Capturar Throwable
+            \Log::error('Installer execution quick failed: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Error durante la instalación: ' . $e->getMessage()
@@ -226,15 +230,23 @@ class InstallerController extends Controller
     public function processAdvancedMigrations(Request $request)
     {
         if ($request->run_migrations === 'yes') {
+            $dbConfig = session('installer.database');
+            if (!$dbConfig) {
+                 \Log::error('Installer: Database configuration not found in session during processAdvancedMigrations.');
+                 return back()->withErrors(['migrations' => 'Error crítico: Configuración de base de datos no encontrada. Vuelva al paso anterior y reintente.']);
+            }
             // Actualizar .env con configuración de BD
-            $this->installer->updateEnvironmentFile(session('installer.database'));
+            $this->installer->updateEnvironmentFile($dbConfig);
 
             // Ejecutar migraciones
-            if (!$this->installer->runMigrations()) {
-                return back()->withErrors(['migrations' => 'Error al ejecutar las migraciones.']);
+            if (!$this->installer->runMigrations()) { // runMigrations() ahora verifica Schema::hasTable('users')
+                return back()->withErrors(['migrations' => 'Error al ejecutar las migraciones o la tabla de usuarios no se creó correctamente. Verifique los logs del servidor para más detalles.']);
             }
 
             session(['installer.migrations_run' => true]);
+        } else {
+            // Asegurarse de que si el usuario desmarca la opción, la sesión lo refleje.
+            session(['installer.migrations_run' => false]);
         }
 
         return redirect()->route('installer.advanced.environment');
@@ -256,16 +268,40 @@ class InstallerController extends Controller
         $envConfig = [];
 
         if ($request->filled('app_name')) {
-            $envConfig['APP_NAME'] = '"' . $request->app_name . '"';
+            $envConfig['APP_NAME'] = $this->prepareEnvValue($request->app_name);
         }
 
+        // Preparar MAIL_FROM_NAME primero, ya que puede depender de app_name
+        $mailFromName = null;
+        if ($request->filled('app_name')) {
+            $mailFromName = $request->app_name;
+        } elseif (config('app.name') && config('app.name') !== 'Laravel') {
+            // Usar el config('app.name') actual solo si es significativo (no el default 'Laravel')
+            // y no se proporcionó un app_name en el request.
+            $mailFromName = config('app.name');
+        }
+        // Si el usuario provee un MAIL_FROM_NAME específico en el formulario (no implementado actualmente pero por si acaso)
+        // if ($request->filled('mail_from_name_input')) {
+        //    $mailFromName = $request->mail_from_name_input;
+        // }
+
+
         if ($request->filled('mail_driver')) {
-            $envConfig['MAIL_MAILER'] = $request->mail_driver;
-            $envConfig['MAIL_HOST'] = $request->mail_host;
-            $envConfig['MAIL_PORT'] = $request->mail_port;
-            $envConfig['MAIL_USERNAME'] = $request->mail_username;
-            $envConfig['MAIL_PASSWORD'] = $request->mail_password;
-            $envConfig['MAIL_ENCRYPTION'] = $request->mail_encryption;
+            $envConfig['MAIL_MAILER'] = $this->prepareEnvValue($request->mail_driver);
+            $envConfig['MAIL_HOST'] = $this->prepareEnvValue($request->mail_host);
+            $envConfig['MAIL_PORT'] = $this->prepareEnvValue($request->mail_port);
+            $envConfig['MAIL_USERNAME'] = $this->prepareEnvValue($request->mail_username);
+            $envConfig['MAIL_PASSWORD'] = $this->prepareEnvValue($request->mail_password); // Las contraseñas pueden tener caracteres especiales
+            $envConfig['MAIL_ENCRYPTION'] = $this->prepareEnvValue($request->mail_encryption);
+
+            if ($request->filled('mail_from_address')) {
+                $envConfig['MAIL_FROM_ADDRESS'] = $this->prepareEnvValue($request->mail_from_address);
+            }
+
+            // Usar el $mailFromName determinado anteriormente
+            if ($mailFromName) {
+                 $envConfig['MAIL_FROM_NAME'] = $this->prepareEnvValue($mailFromName);
+            }
         }
 
         session(['installer.environment' => $envConfig]);
@@ -307,12 +343,20 @@ class InstallerController extends Controller
     public function executeAdvancedInstall()
     {
         try {
+            $finalConfig = session('installer.final_config');
+
+            if (!$finalConfig || !isset($finalConfig['environment_type']) || !isset($finalConfig['disable_api'])) {
+                \Log::error('Installer: Missing or incomplete final_config in session during executeAdvancedInstall.', ['session_data' => session()->all()]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error interno: La configuración final es inválida o no se encontró en la sesión. Por favor, reinicie el proceso de instalación.'
+                ]);
+            }
+
             // Actualizar configuración de entorno
             if (session('installer.environment')) {
                 $this->installer->updateEnvironmentFile(session('installer.environment'));
             }
-
-            $finalConfig = session('installer.final_config');
 
             // Aplicar configuraciones según el tipo de entorno
             if ($finalConfig['environment_type'] === 'production') {
@@ -344,10 +388,20 @@ class InstallerController extends Controller
                 'credentials' => $credentials
             ]);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) { // Capturar Throwable para errores más generales también
+            // Loggear más detalles del error
+            \Log::error('Installer execution advanced failed: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'session_data' => session()->all() // Loguear datos de sesión puede ayudar a diagnosticar
+            ]);
             return response()->json([
                 'success' => false,
+                // No exponer detalles sensibles del error al cliente en producción, pero sí en desarrollo.
+                // Para este paquete, dado que es una herramienta de instalación, podría ser útil mostrar más.
                 'message' => 'Error durante la instalación: ' . $e->getMessage()
+                             // . (config('app.debug') ? ' (' . basename($e->getFile()) . ':' . $e->getLine() . ')' : '')
             ]);
         }
     }
@@ -362,5 +416,43 @@ class InstallerController extends Controller
         }
 
         return view('installer::complete');
+    }
+
+    /**
+     * Prepara un valor para ser escrito en el archivo .env, añadiendo comillas si es necesario.
+     */
+    private function prepareEnvValue($value): string
+    {
+        // Si el valor está vacío o es nulo, devolver una cadena vacía para el .env
+        // (esto efectivamente "borrará" la variable si se escribe como KEY=)
+        // o se puede optar por no añadir la clave al array $envConfig si el valor es nulo/vacío.
+        // Por ahora, si es null, devolvemos string vacío. Si es string vacío, se queda así.
+        if (is_null($value)) {
+            return '';
+        }
+
+        $value = (string) $value; // Asegurar que sea string
+
+        // Si el valor ya está correctamente entrecomillado (simple o doble)
+        if ((str_starts_with($value, '"') && str_ends_with($value, '"')) ||
+            (str_starts_with($value, "'") && str_ends_with($value, "'"))) {
+            return $value;
+        }
+
+        // Si el valor contiene espacios, $, #, =, o comillas (simples o dobles) en su interior,
+        // o si está vacío y queremos representarlo como KEY="", entonces lo encerramos entre comillas dobles.
+        // Un valor vacío sin comillas (KEY=) es válido en .env para significar "nulo" o vacío.
+        // Si queremos un string vacío literal, es KEY="".
+        // Aquí, si $value es un string vacío después del casteo, lo dejamos como está.
+        // Solo añadimos comillas si hay caracteres problemáticos o espacios.
+        if (preg_match('/\\s|\\$|#|=|"|\'/', $value)) {
+            // Escapar comillas dobles internas y backslashes antes de encerrar
+            $value = str_replace('\\', '\\\\', $value);
+            $value = str_replace('"', '\\"', $value);
+            return '"' . $value . '"';
+        }
+
+        // Para valores simples sin espacios ni caracteres problemáticos, no se requieren comillas.
+        return $value;
     }
 }

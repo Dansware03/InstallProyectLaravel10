@@ -4,91 +4,100 @@
 
 @section('header', 'Verificación de Requisitos')
 
-@section('description', 'Se detectaron problemas que deben resolverse antes de continuar')
+@section('description', 'Se han detectado problemas de requisitos que deben resolverse antes de continuar.')
+
+{{-- Esta vista es condicional y no forma parte del flujo principal de pasos numerados --}}
+{{-- No se define $stepsData aquí --}}
 
 @section('content')
-<div class="alert alert-warning">
-    <i class="fas fa-exclamation-triangle me-2"></i>
-    <strong>Atención:</strong> Se encontraron algunos requisitos que no se cumplen. 
-    Debe resolverlos antes de continuar con la instalación.
-</div>
-
-<div class="mb-4">
-    <h4><i class="fas fa-server me-2"></i>Versión de PHP</h4>
-    <div class="requirement-item {{ $requirements['php_version']['satisfied'] ? 'success' : 'error' }}">
-        <div class="me-3">
-            @if($requirements['php_version']['satisfied'])
-                <i class="fas fa-check-circle text-success"></i>
-            @else
-                <i class="fas fa-times-circle text-danger"></i>
-            @endif
-        </div>
-        <div class="flex-grow-1">
-            <strong>Versión de PHP:</strong> {{ $requirements['php_version']['current'] }}
-            <small class="text-muted d-block">Requerida: {{ $requirements['php_version']['required'] }} o superior</small>
-        </div>
+<div class="alert alert-danger d-flex align-items-center" role="alert">
+    <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+    <div>
+        <strong>Atención:</strong> Se encontraron algunos requisitos del sistema que no se cumplen.
+        Debe resolverlos antes de poder continuar con la instalación.
     </div>
 </div>
 
-<div class="mb-4">
-    <h4><i class="fas fa-puzzle-piece me-2"></i>Extensiones de PHP</h4>
-    @foreach($requirements['php_extensions'] as $extension => $status)
-        <div class="requirement-item {{ $status['installed'] ? 'success' : 'error' }}">
-            <div class="me-3">
-                @if($status['installed'])
-                    <i class="fas fa-check-circle text-success"></i>
-                @else
-                    <i class="fas fa-times-circle text-danger"></i>
-                @endif
+<div class="mb-4 mt-4">
+    <h5><i class="fas fa-server me-2 text-primary"></i>Versión de PHP</h5>
+    <ul class="list-group">
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas {{ $requirements['php_version']['satisfied'] ? 'fa-check-circle text-success' : 'fa-times-circle text-danger' }} me-2"></i>
+                PHP {{ $requirements['php_version']['required'] }} o superior
+                <small class="text-muted d-block ms-4">Actual: {{ $requirements['php_version']['current'] }}</small>
             </div>
-            <div class="flex-grow-1">
-                <strong>{{ $extension }}</strong>
-                @if(!$status['installed'])
-                    <small class="text-danger d-block">Esta extensión debe ser instalada y habilitada</small>
-                @endif
-            </div>
-        </div>
-    @endforeach
+            @if ($requirements['php_version']['satisfied'])
+                <span class="badge bg-success">Cumplido</span>
+            @else
+                <span class="badge bg-danger">No Cumplido</span>
+            @endif
+        </li>
+    </ul>
 </div>
 
 <div class="mb-4">
-    <h4><i class="fas fa-folder me-2"></i>Permisos de Directorios</h4>
-    @foreach($requirements['permissions'] as $path => $status)
-        <div class="requirement-item {{ $status['satisfied'] ? 'success' : 'error' }}">
-            <div class="me-3">
-                @if($status['satisfied'])
-                    <i class="fas fa-check-circle text-success"></i>
+    <h5><i class="fas fa-puzzle-piece me-2 text-primary"></i>Extensiones de PHP</h5>
+    <ul class="list-group">
+        @foreach($requirements['php_extensions'] as $extension => $status)
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas {{ $status['installed'] ? 'fa-check-circle text-success' : 'fa-times-circle text-danger' }} me-2"></i>
+                    Extensión: <strong>{{ $extension }}</strong>
+                </div>
+                @if ($status['installed'])
+                    <span class="badge bg-success">Instalada</span>
                 @else
-                    <i class="fas fa-times-circle text-danger"></i>
+                    <span class="badge bg-danger">No Instalada</span>
                 @endif
-            </div>
-            <div class="flex-grow-1">
-                <strong>{{ $path }}</strong>
-                <small class="text-muted d-block">
-                    Actual: {{ $status['current'] }} | Requerido: {{ $status['required'] }}
-                </small>
-                @if(!$status['satisfied'])
-                    <small class="text-danger d-block">
-                        Ejecute: <code>chmod -R {{ $status['required'] }} {{ $path }}</code>
-                    </small>
-                @endif
-            </div>
-        </div>
-    @endforeach
+            </li>
+        @endforeach
+    </ul>
 </div>
 
-<div class="alert alert-info">
-    <i class="fas fa-lightbulb me-2"></i>
-    <strong>Ayuda:</strong> Contacte con su administrador de sistemas o proveedor de hosting 
-    para resolver estos requisitos. Una vez resueltos, recargue esta página para continuar.
+<div class="mb-4">
+    <h5><i class="fas fa-folder-open me-2 text-primary"></i>Permisos de Directorio</h5>
+    <ul class="list-group">
+        @foreach($requirements['permissions'] as $path => $status)
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas {{ $status['satisfied'] ? 'fa-check-circle text-success' : 'fa-times-circle text-danger' }} me-2"></i>
+                    Permisos para <code>{{ $path }}</code>
+                    <small class="text-muted d-block ms-4">Requerido: {{ $status['required'] }} (Actual: {{ $status['current'] }})</small>
+                </div>
+                @if ($status['satisfied'])
+                    <span class="badge bg-success">Correctos</span>
+                @else
+                    <span class="badge bg-danger">Incorrectos</span>
+                @endif
+            </li>
+            @if (!$status['satisfied'] && isset($status['required']))
+            <li class="list-group-item list-group-item-light py-2 small">
+                <i class="fas fa-info-circle me-1"></i>Sugerencia: <code>chmod -R {{ $status['required'] }} {{ $path }}</code> (ejecutar en la raíz del proyecto)
+            </li>
+            @endif
+        @endforeach
+    </ul>
 </div>
 
-<div class="d-flex justify-content-between">
-    <a href="{{ route('installer.welcome') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left me-2"></i>Volver
-    </a>
-    <button onclick="location.reload()" class="btn btn-primary">
-        <i class="fas fa-sync-alt me-2"></i>Verificar Nuevamente
-    </button>
+<div class="alert alert-info mt-4 d-flex align-items-center" role="alert">
+    <i class="fas fa-lightbulb fa-2x me-3"></i>
+    <div>
+        <strong>Ayuda:</strong> Contacte con el administrador de su sistema o proveedor de hosting para resolver estos problemas.
+        Una vez resueltos, recargue esta página para verificar nuevamente.
+    </div>
 </div>
 @endsection
+
+@section('footer-actions')
+    <a href="{{ route('installer.welcome') }}" class="btn btn-installer">
+        <i class="fas fa-arrow-left me-1"></i> Volver
+    </a>
+    <button onclick="location.reload()" class="btn btn-installer-primary">
+        <i class="fas fa-sync-alt me-1"></i> Verificar Nuevamente
+    </button>
+@endsection
+
+@push('scripts')
+{{-- No scripts specific to this view for now, but ensuring the stack is properly handled. --}}
+@endpush

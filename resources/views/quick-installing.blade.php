@@ -1,240 +1,220 @@
 @extends('installer::layout')
 
+@php
+$stepsData = [
+    'total' => [
+        ['name' => 'Requisitos', 'status' => 'completed'],
+        ['name' => 'Base de Datos', 'status' => 'completed'],
+        ['name' => 'Instalación', 'status' => 'active'],
+    ]
+];
+@endphp
+
 @section('title', 'Instalando - Instalación Rápida')
-
 @section('header', 'Instalación en Progreso')
-
-@section('description', 'Por favor espere mientras configuramos su aplicación')
-
-@section('steps')
-    <div class="step-indicator">
-        <div class="step completed">1</div>
-        <div class="step completed">2</div>
-        <div class="step active">3</div>
-    </div>
-@endsection
+@section('description', 'Por favor espere mientras configuramos su aplicación.')
 
 @section('content')
-<div class="text-center">
+<div class="text-center" id="installing-content">
     <div class="mb-4">
-        <i class="fas fa-cogs fa-spin" style="font-size: 4rem; color: #FF512F;"></i>
+        <i class="fas fa-cog fa-spin fa-3x text-primary"></i>
     </div>
 
-    <h3 class="mb-4">Configurando su aplicación...</h3>
+    <h5 class="mb-3" id="installation-main-status-text">Configurando su aplicación...</h5>
 
-    <div class="progress mb-4" style="height: 30px;">
-        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+    <div class="progress mb-3" style="height: 20px;">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+            style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="main-progress-bar">0%</div>
     </div>
 
-    <div id="installation-status" class="mb-4">
-        <p class="lead">Inicializando instalación...</p>
-    </div>
+    <p class="text-muted small mb-4" id="installation-step-text">Inicializando instalación...</p>
 
-    <div id="installation-steps" class="text-start">
-        <div class="installation-step" data-step="database">
-            <i class="fas fa-circle-notch fa-spin me-2"></i>
-            <span>Configurando base de datos...</span>
-        </div>
-    </div>
-
-    <div id="installation-complete" style="display: none;">
-        <div class="alert alert-success">
-            <i class="fas fa-check-circle me-2"></i>
-            <strong>¡Instalación completada exitosamente!</strong>
+    {{-- Esta sección se mostrará al completar la instalación --}}
+    <div id="installation-complete" style="display: none;" class="mt-4 text-start">
+        <div class="alert alert-success d-flex align-items-center py-3" role="alert">
+            <i class="fas fa-check-circle fa-2x me-3"></i>
+            <div>
+                <strong class="h5">¡Instalación completada exitosamente!</strong>
+            </div>
         </div>
 
-        <div class="card">
+        <div class="card mt-3" id="credentials-card" style="display:none;">
             <div class="card-header">
-                <h5><i class="fas fa-key me-2"></i>Credenciales de Acceso</h5>
+                <h6 class="mb-0"><i class="fas fa-key me-2"></i>Credenciales de Acceso del Administrador</h6>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <strong>Email:</strong>
-                        <div class="input-group mt-1">
+                <p class="small text-muted">Guarde estas credenciales. Se recomienda cambiar la contraseña después del primer inicio de sesión.</p>
+                <div class="row g-2">
+                    <div class="col-sm-6">
+                        <label for="admin-email" class="form-label small">Email:</label>
+                        <div class="input-group input-group-sm">
                             <input type="text" class="form-control" id="admin-email" readonly>
-                            <button class="btn btn-outline-secondary" type="button"
-                                onclick="copyToClipboard('admin-email', this)">
+                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('admin-email', this)">
                                 <i class="fas fa-copy"></i>
                             </button>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <strong>Contraseña:</strong>
-                        <div class="input-group mt-1">
+                    <div class="col-sm-6">
+                        <label for="admin-password" class="form-label small">Contraseña:</label>
+                        <div class="input-group input-group-sm">
                             <input type="text" class="form-control" id="admin-password" readonly>
-                            <button class="btn btn-outline-secondary" type="button"
-                                onclick="copyToClipboard('admin-password', this)">
+                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('admin-password', this)">
                                 <i class="fas fa-copy"></i>
                             </button>
                         </div>
                     </div>
-                </div>
-                <div class="alert alert-warning mt-3">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <strong>Importante:</strong> Guarde estas credenciales en un lugar seguro.
-                    Se recomienda cambiar la contraseña después del primer acceso.
                 </div>
             </div>
         </div>
-
-        <div class="mt-4">
-            <a href="/login" class="btn btn-primary btn-lg">
-                <i class="fas fa-sign-in-alt me-2"></i>Ir al Login
-            </a>
-        </div>
     </div>
 
-    <div id="installation-error" style="display: none;">
-        <div class="alert alert-danger">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            <strong>Error durante la instalación:</strong>
-            <div id="error-message"></div>
-        </div>
-
-        <div class="mt-4">
-            <a href="{{ route('installer.welcome') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Volver al Inicio
-            </a>
+    {{-- Esta sección se mostrará si hay un error --}}
+    <div id="installation-error" style="display: none;" class="mt-4 text-start">
+        <div class="alert alert-danger d-flex align-items-center py-3" role="alert">
+             <i class="fas fa-times-circle fa-2x me-3"></i>
+            <div>
+                <strong class="h5">Error durante la instalación</strong>
+                <div id="error-message" class="mt-1 small"></div>
+            </div>
         </div>
     </div>
 </div>
+@endsection
+
+@section('footer-actions')
+    <div id="actions-in-progress" class="w-100 text-center">
+        <button type="button" class="btn btn-installer" disabled>
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Instalando...
+        </button>
+    </div>
+    <div id="actions-complete" style="display:none;">
+        <a href="{{ url('/') }}" class="btn btn-installer-primary">
+            <i class="fas fa-home me-1"></i> Ir a la Aplicación
+        </a>
+    </div>
+     <div id="actions-error" style="display:none;">
+        <a href="{{ route('installer.welcome') }}" class="btn btn-installer">
+            <i class="fas fa-arrow-left me-1"></i> Volver al Inicio
+        </a>
+    </div>
+@endsection
 
 @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const progressBar = document.querySelector('.progress-bar');
-            const statusElement = document.getElementById('installation-status');
-            const stepsContainer = document.getElementById('installation-steps');
-            const completeSection = document.getElementById('installation-complete');
-            const errorSection = document.getElementById('installation-error');
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const mainProgressBar = document.getElementById('main-progress-bar');
+    const installationMainStatusText = document.getElementById('installation-main-status-text');
+    const installationStepText = document.getElementById('installation-step-text');
 
-            let currentStep = 0;
-            const steps = [
-                { key: 'database', text: 'Configurando base de datos...', progress: 20 },
-                { key: 'migrations', text: 'Ejecutando migraciones...', progress: 40 },
-                { key: 'security', text: 'Aplicando configuraciones de seguridad...', progress: 60 },
-                { key: 'optimizations', text: 'Aplicando optimizaciones...', progress: 80 },
-                { key: 'user', text: 'Creando usuario administrador...', progress: 95 },
-                { key: 'complete', text: 'Finalizando instalación...', progress: 100 }
-            ];
+    const completeSection = document.getElementById('installation-complete');
+    const credentialsCard = document.getElementById('credentials-card');
+    const adminEmailField = document.getElementById('admin-email');
+    const adminPasswordField = document.getElementById('admin-password');
 
-            function updateProgress() {
-                if (currentStep < steps.length) {
-                    const step = steps[currentStep];
+    const errorSection = document.getElementById('installation-error');
+    const errorMessageDiv = document.getElementById('error-message');
 
-                    // Actualizar barra de progreso
-                    progressBar.style.width = step.progress + '%';
+    const actionsInProgress = document.getElementById('actions-in-progress');
+    const actionsComplete = document.getElementById('actions-complete');
+    const actionsError = document.getElementById('actions-error');
 
-                    // Actualizar estado
-                    statusElement.innerHTML = `<p class="lead">${step.text}</p>`;
+    const steps = [
+        { text: 'Configurando base de datos...', progress: 20 },
+        { text: 'Ejecutando migraciones...', progress: 40 },
+        { text: 'Aplicando configuraciones de seguridad...', progress: 60 },
+        { text: 'Aplicando optimizaciones de producción...', progress: 80 },
+        { text: 'Creando usuario administrador...', progress: 95 },
+        { text: 'Finalizando instalación...', progress: 100 }
+    ];
+    let currentStepIndex = 0;
 
-                    // Actualizar pasos
-                    updateStepDisplay();
+    function updateVisualProgress() {
+        if (currentStepIndex < steps.length) {
+            const step = steps[currentStepIndex];
+            mainProgressBar.style.width = step.progress + '%';
+            mainProgressBar.textContent = step.progress + '%';
+            mainProgressBar.setAttribute('aria-valuenow', step.progress);
+            installationStepText.textContent = step.text;
 
-                    currentStep++;
-
-                    if (currentStep < steps.length) {
-                        setTimeout(updateProgress, 1500); // Simular tiempo de procesamiento
-                    } else {
-                        // Ejecutar instalación real
-                        executeInstallation();
-                    }
-                }
+            currentStepIndex++;
+            if (currentStepIndex < steps.length) {
+                setTimeout(updateVisualProgress, 700 + Math.random() * 500); // Simular tiempo
+            } else {
+                // Al final de la simulación visual, realizar la petición real
+                installationStepText.textContent = 'Enviando configuración al servidor...';
+                executeRealInstallation();
             }
+        }
+    }
 
-            function updateStepDisplay() {
-                const currentStepData = steps[currentStep];
-                stepsContainer.innerHTML = `
-                <div class="installation-step" data-step="${currentStepData.key}">
-                    <i class="fas fa-circle-notch fa-spin me-2"></i>
-                    <span>${currentStepData.text}</span>
-                </div>
-            `;
+    function executeRealInstallation() {
+        fetch('{{ route("installer.quick.execute") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             }
-
-            function executeInstallation() {
-                // Hacer petición AJAX real para ejecutar la instalación
-                fetch('{{ route("installer.quick.execute") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            showSuccess(data.credentials);
-                        } else {
-                            showError(data.message);
-                        }
-                    })
-                    .catch(error => {
-                        showError('Error de conexión: ' + error.message);
-                    });
-            }
-
-            function showSuccess(credentials) {
-                progressBar.style.width = '100%';
-                statusElement.innerHTML = '<p class="lead text-success">¡Instalación completada!</p>';
-                stepsContainer.style.display = 'none';
-
-                // Mostrar credenciales
-                document.getElementById('admin-email').value = credentials.email;
-                document.getElementById('admin-password').value = credentials.password;
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                installationMainStatusText.innerHTML = '<i class="fas fa-check-circle me-2 text-success"></i>Instalación Completada';
+                installationStepText.textContent = 'Su aplicación ha sido configurada exitosamente.';
+                mainProgressBar.style.width = '100%';
+                mainProgressBar.textContent = '100%';
+                mainProgressBar.classList.add('bg-success');
 
                 completeSection.style.display = 'block';
+                if (data.credentials && data.credentials.email && data.credentials.password) {
+                    credentialsCard.style.display = 'block';
+                    adminEmailField.value = data.credentials.email;
+                    adminPasswordField.value = data.credentials.password;
+                }
+                actionsInProgress.style.display = 'none';
+                actionsComplete.style.display = 'block';
+            } else {
+                showError(data.message || 'Ocurrió un error desconocido durante la instalación.');
             }
-
-            function showError(message) {
-                stepsContainer.style.display = 'none';
-                document.getElementById('error-message').textContent = message;
-                errorSection.style.display = 'block';
-            }
-
-            // Función para copiar al portapapeles
-            window.copyToClipboard = function (elementId, buttonElement) {
-                const element = document.getElementById(elementId);
-                if (!element) return;
-
-                navigator.clipboard.writeText(element.value).then(function() {
-                    const originalHtml = buttonElement.innerHTML;
-                    buttonElement.innerHTML = '<i class="fas fa-check"></i> Copiado';
-                    buttonElement.classList.add('btn-success');
-                    buttonElement.classList.remove('btn-outline-secondary');
-
-                    setTimeout(() => {
-                        buttonElement.innerHTML = originalHtml;
-                        buttonElement.classList.remove('btn-success');
-                        buttonElement.classList.add('btn-outline-secondary');
-                    }, 2000);
-                }, function(err) {
-                    // Fallback para execCommand si navigator.clipboard no está disponible o falla
-                    try {
-                        element.select();
-                        element.setSelectionRange(0, 99999); // Para móviles
-                        document.execCommand('copy');
-
-                        const originalHtml = buttonElement.innerHTML;
-                        buttonElement.innerHTML = '<i class="fas fa-check"></i> Copiado (fallback)';
-                        buttonElement.classList.add('btn-success');
-                        buttonElement.classList.remove('btn-outline-secondary');
-
-                        setTimeout(() => {
-                            buttonElement.innerHTML = originalHtml;
-                            buttonElement.classList.remove('btn-success');
-                            buttonElement.classList.add('btn-outline-secondary');
-                        }, 2000);
-                    } catch (execErr) {
-                        console.error('Error al copiar al portapapeles: ', execErr);
-                        alert('Error al copiar. Por favor, copie manualmente.');
-                    }
-                });
-            };
-
-            // Iniciar el proceso
-            setTimeout(updateProgress, 1000);
+        })
+        .catch(error => {
+            showError('Error de conexión o respuesta inesperada del servidor: ' + error.message);
         });
-    </script>
+    }
+
+    function showError(message) {
+        installationMainStatusText.innerHTML = '<i class="fas fa-times-circle me-2 text-danger"></i>Fallo en la Instalación';
+        installationStepText.textContent = 'No se pudo completar la instalación.';
+        mainProgressBar.classList.add('bg-danger');
+        mainProgressBar.style.width = '100%'; // Marcar como finalizado pero con error
+
+        errorSection.style.display = 'block';
+        errorMessageDiv.innerHTML = message.replace(/\n/g, '<br>');
+
+        actionsInProgress.style.display = 'none';
+        actionsError.style.display = 'block';
+    }
+
+    window.copyToClipboard = function (elementId, buttonElement) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+        navigator.clipboard.writeText(element.value).then(function() {
+            const originalHtml = buttonElement.innerHTML;
+            buttonElement.innerHTML = '<i class="fas fa-check"></i>';
+            buttonElement.classList.add('btn-success');
+            buttonElement.classList.remove('btn-outline-secondary');
+            setTimeout(() => {
+                buttonElement.innerHTML = originalHtml;
+                buttonElement.classList.remove('btn-success');
+                buttonElement.classList.add('btn-outline-secondary');
+            }, 1500);
+        }).catch(err => {
+            console.error('Error al copiar: ', err);
+        });
+    };
+
+    // Iniciar el proceso visual
+    setTimeout(updateVisualProgress, 500);
+});
+</script>
 @endpush

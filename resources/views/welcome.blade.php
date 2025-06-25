@@ -4,77 +4,66 @@
 
 @section('header', 'Bienvenido')
 
-@section('description', 'Seleccione el tipo de instalación que desea realizar')
+@section('description', 'Seleccione el tipo de instalación que desea realizar para configurar su aplicación Laravel.')
+
+{{-- Esta vista no tiene un indicador de progreso de pasos numerados --}}
 
 @section('content')
-<div class="text-center">
-    <div class="mb-4">
-        <i class="fas fa-rocket" style="font-size: 4rem; color: #FF512F;"></i>
+    <div class="text-center mb-4">
+        {{-- Icono principal o logo del instalador podría ir aquí si se desea --}}
+        {{-- <i class="fas fa-cogs fa-3x text-muted mb-3"></i> --}}
+         <p class="lead" style="font-size: 1.1rem;">
+            Este asistente le guiará a través del proceso de configuración de su aplicación.
+        </p>
+        <p>Por favor, seleccione una de las siguientes opciones para comenzar:</p>
     </div>
-    
-    <h3 class="mb-4">¡Bienvenido al Asistente de Instalación!</h3>
-    
-    <p class="lead mb-5">
-        Este asistente le ayudará a configurar su aplicación Laravel de manera rápida y segura.
-        Seleccione una de las siguientes opciones para comenzar:
-    </p>
-    
-    <div class="row g-4">
+
+    <div class="row g-4 justify-content-center">
         <div class="col-md-6">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body text-center p-4">
+            <div class="card h-100">
+                <div class="card-body text-center p-4 d-flex flex-column">
                     <div class="mb-3">
-                        <i class="fas fa-bolt text-success" style="font-size: 3rem;"></i>
+                        <i class="fas fa-bolt fa-2x" style="color: #0078d4;"></i>
                     </div>
-                    <h4 class="card-title">Instalación Rápida</h4>
-                    <p class="card-text">
-                        Configuración automática con ajustes predeterminados optimizados para producción.
-                        Solo necesita proporcionar los datos de la base de datos.
+                    <h5 class="card-title">Instalación Rápida</h5>
+                    <p class="card-text text-muted small mb-3 flex-grow-1">
+                        Configuración automática con ajustes predeterminados. Ideal para iniciar rápidamente y para entornos de producción estándar.
                     </p>
-                    <ul class="list-unstyled text-start mb-4">
-                        <li><i class="fas fa-check text-success me-2"></i>Verificación automática de requisitos</li>
-                        <li><i class="fas fa-check text-success me-2"></i>Configuración de seguridad</li>
-                        <li><i class="fas fa-check text-success me-2"></i>Optimizaciones de producción</li>
-                        <li><i class="fas fa-check text-success me-2"></i>Usuario administrador automático</li>
-                    </ul>
-                    <a href="{{ route('installer.quick') }}" class="btn btn-success btn-lg">
-                        <i class="fas fa-rocket me-2"></i>Instalación Rápida
+                    <a href="{{ route('installer.quick') }}" class="btn btn-installer-primary w-100">
+                        <i class="fas fa-rocket me-2"></i>Elegir Rápida
                     </a>
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-6">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body text-center p-4">
-                    <div class="mb-3">
-                        <i class="fas fa-cogs text-primary" style="font-size: 3rem;"></i>
+            <div class="card h-100">
+                <div class="card-body text-center p-4 d-flex flex-column">
+                     <div class="mb-3">
+                        <i class="fas fa-sliders-h fa-2x" style="color: #5cb85c;"></i>
                     </div>
-                    <h4 class="card-title">Instalación Avanzada</h4>
-                    <p class="card-text">
-                        Configuración paso a paso con control total sobre cada aspecto de la instalación.
-                        Recomendado para usuarios experimentados.
+                    <h5 class="card-title">Instalación Avanzada</h5>
+                    <p class="card-text text-muted small mb-3 flex-grow-1">
+                        Control total sobre cada aspecto de la configuración. Recomendado para usuarios experimentados o configuraciones personalizadas.
                     </p>
-                    <ul class="list-unstyled text-start mb-4">
-                        <li><i class="fas fa-check text-primary me-2"></i>Control total de la configuración</li>
-                        <li><i class="fas fa-check text-primary me-2"></i>Verificación manual de requisitos</li>
-                        <li><i class="fas fa-check text-primary me-2"></i>Configuración de correo</li>
-                        <li><i class="fas fa-check text-primary me-2"></i>Entorno desarrollo/producción</li>
-                    </ul>
-                    <a href="{{ route('installer.advanced.requirements') }}" class="btn btn-primary btn-lg">
-                        <i class="fas fa-cogs me-2"></i>Instalación Avanzada
+                    <a href="{{ route('installer.advanced.requirements') }}" class="btn btn-installer w-100" style="background-color: #f0f0f0;">
+                        <i class="fas fa-cogs me-2"></i>Elegir Avanzada
                     </a>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <div class="mt-5">
-        <div class="alert alert-info">
+        <div class="alert alert-secondary small py-2 px-3">
             <i class="fas fa-info-circle me-2"></i>
-            <strong>Importante:</strong> Asegúrese de haber copiado el archivo <code>.env.example</code> a <code>.env</code> 
-            antes de comenzar la instalación.
+            <strong>Nota Importante:</strong> Antes de iniciar, asegúrese de haber copiado su archivo <code>.env.example</code> a <code>.env</code> si aún no lo ha hecho.
         </div>
     </div>
-</div>
+@endsection
+
+@section('footer-actions')
+    {{-- No hay acciones directas en el footer para la página de bienvenida, la acción es elegir una opción. --}}
+    {{-- Podríamos poner un botón "Salir" simbólico si fuera una app de escritorio real --}}
+    {{-- <button type="button" class="btn btn-installer" disabled>Siguiente &gt;</button> --}}
 @endsection
