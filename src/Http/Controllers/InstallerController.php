@@ -230,12 +230,17 @@ class InstallerController extends Controller
     public function processAdvancedMigrations(Request $request)
     {
         if ($request->run_migrations === 'yes') {
+            $dbConfig = session('installer.database');
+            if (!$dbConfig) {
+                 \Log::error('Installer: Database configuration not found in session during processAdvancedMigrations.');
+                 return back()->withErrors(['migrations' => 'Error crítico: Configuración de base de datos no encontrada. Vuelva al paso anterior y reintente.']);
+            }
             // Actualizar .env con configuración de BD
-            $this->installer->updateEnvironmentFile(session('installer.database'));
+            $this->installer->updateEnvironmentFile($dbConfig);
 
             // Ejecutar migraciones
-            if (!$this->installer->runMigrations()) {
-                return back()->withErrors(['migrations' => 'Error al ejecutar las migraciones.']);
+            if (!$this->installer->runMigrations()) { // runMigrations() ahora verifica Schema::hasTable('users')
+                return back()->withErrors(['migrations' => 'Error al ejecutar las migraciones o la tabla de usuarios no se creó correctamente. Verifique los logs del servidor para más detalles.']);
             }
 
             session(['installer.migrations_run' => true]);

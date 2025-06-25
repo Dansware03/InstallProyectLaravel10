@@ -156,27 +156,25 @@ class InstallerManager
 
             $exitCode = Artisan::call('migrate', [
                 '--force' => true,
-                // '--path' => 'database/migrations', // Opcional: especificar la ruta si es necesario
-                // '--database' => config('database.default') // Opcional: especificar la conexión
             ]);
 
             if ($exitCode === 0) {
-                \Log::info('Installer: Migrations executed successfully (exit code 0).');
-                return true;
+                \Log::info('Installer: Artisan migrate command executed successfully (exit code 0).');
+                // Verificar explícitamente si la tabla 'users' existe después de las migraciones
+                if (\Illuminate\Support\Facades\Schema::hasTable('users')) {
+                    \Log::info('Installer: Table "users" exists after migration.');
+                    return true;
+                } else {
+                    \Log::error('Installer: Table "users" DOES NOT exist after Artisan migrate command (exit code 0). This is unexpected.');
+                    return false;
+                }
             } else {
-                $output = '';
-                // Try to get output if available (Kernel contract might be needed)
-                // For simplicity, just logging the exit code. Detailed output might require more setup.
-                // if (app() instanceof \Illuminate\Contracts\Console\Kernel) {
-                //     $output = app('Illuminate\Contracts\Console\Kernel')->output();
-                // }
-                \Log::error('Installer: Migrations command failed.', [
+                \Log::error('Installer: Artisan migrate command failed.', [
                     'exit_code' => $exitCode,
-                    // 'output' => $output // Uncomment if output retrieval is implemented
                 ]);
                 return false;
             }
-        } catch (\Throwable $e) { // Catch Throwable for broader error capturing
+        } catch (\Throwable $e) {
             \Log::error('Installer: Exception during runMigrations.', [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
