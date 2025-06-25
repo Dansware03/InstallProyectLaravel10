@@ -113,7 +113,7 @@ $stepsData = [
             <i class="fas fa-arrow-left me-1"></i> Volver al Inicio
         </a>
     </div>
-@endpush
+@endsection
 
 @push('scripts')
 <script>
