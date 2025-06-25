@@ -7,32 +7,39 @@
 @section('description', 'Por favor espere mientras configuramos su aplicación')
 
 @section('steps')
-<ul class="step-indicator-vertical">
-    <li class="step completed">
-        <span class="step-number"><i class="fas fa-check"></i></span>
-        <span class="step-label">Requisitos</span>
-    </li>
-    <li class="step completed">
-        <span class="step-number"><i class="fas fa-check"></i></span>
-        <span class="step-label">Base de Datos</span>
-    </li>
-    <li class="step active">
-        <span class="step-number">3</span>
-        <span class="step-label">Instalación</span>
-    </li>
-</ul>
+    <ul class="step-indicator-vertical">
+        <li class="step completed">
+            <span class="step-number"><i class="fas fa-check"></i></span>
+            <span class="step-label">Requisitos</span>
+        </li>
+        <li class="step completed">
+            <span class="step-number"><i class="fas fa-check"></i></span>
+            <span class="step-label">Base de Datos</span>
+        </li>
+        <li class="step active">
+            <span class="step-number">3</span>
+            <span class="step-label">Instalación</span>
+        </li>
+    </ul>
 @endsection
 
 @section('content')
 <div class="text-center">
-    <div class="mb-4">
-        <i class="fas fa-cogs fa-spin" style="font-size: 4rem; color: #FF512F;"></i>
+    <div class="mb-4 position-relative">
+        <div class="installation-spinner">
+            <div class="spinner-ring">
+                <div class="spinner-inner">
+                    <i class="fas fa-rocket" style="font-size: 2rem; color: #FF512F;"></i>
+                </div>
+            </div>
+        </div>
     </div>
 
     <h4 class="mb-4 text-primary"><i class="fas fa-spinner fa-spin me-2"></i>Configurando su aplicación...</h4>
 
     <div class="progress mb-4" style="height: 26px;">
-        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%; font-size: 0.8rem;"></div>
+        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+            style="width: 0%; font-size: 0.8rem;"></div>
     </div>
 
     <div id="installation-status" class="mb-4">
@@ -81,7 +88,8 @@
                 </div>
                 <div class="alert alert-warning mt-4 py-2 px-3 small">
                     <i class="fas fa-exclamation-triangle me-2"></i>
-                    <strong>Importante:</strong> Guarde estas credenciales. Se recomienda cambiar la contraseña después del primer acceso.
+                    <strong>Importante:</strong> Guarde estas credenciales. Se recomienda cambiar la contraseña después
+                    del primer acceso.
                 </div>
             </div>
         </div>
@@ -154,11 +162,11 @@
             function updateStepDisplay() {
                 const currentStepData = steps[currentStep];
                 stepsContainer.innerHTML = `
-                <div class="installation-step" data-step="${currentStepData.key}">
-                    <i class="fas fa-circle-notch fa-spin me-2"></i>
-                    <span>${currentStepData.text}</span>
-                </div>
-            `;
+                        <div class="installation-step" data-step="${currentStepData.key}">
+                            <i class="fas fa-circle-notch fa-spin me-2"></i>
+                            <span>${currentStepData.text}</span>
+                        </div>
+                    `;
             }
 
             function executeInstallation() {
@@ -206,7 +214,7 @@
                 const element = document.getElementById(elementId);
                 if (!element) return;
 
-                navigator.clipboard.writeText(element.value).then(function() {
+                navigator.clipboard.writeText(element.value).then(function () {
                     const originalHtml = buttonElement.innerHTML;
                     buttonElement.innerHTML = '<i class="fas fa-check"></i> Copiado';
                     buttonElement.classList.add('btn-success');
@@ -217,7 +225,7 @@
                         buttonElement.classList.remove('btn-success');
                         buttonElement.classList.add('btn-outline-secondary');
                     }, 2000);
-                }, function(err) {
+                }, function (err) {
                     // Fallback para execCommand si navigator.clipboard no está disponible o falla
                     try {
                         element.select();
@@ -245,4 +253,69 @@
             setTimeout(updateProgress, 1000);
         });
     </script>
+    <style>
+        .installation-spinner {
+            display: inline-block;
+            position: relative;
+        }
+
+        .spinner-ring {
+            width: 120px;
+            height: 120px;
+            border: 4px solid rgba(255, 81, 47, 0.1);
+            border-top: 4px solid #FF512F;
+            border-radius: 50%;
+            animation: spin 2s linear infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .spinner-inner {
+            animation: counterSpin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes counterSpin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(-360deg);
+            }
+        }
+
+        .installation-step {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-left: 4px solid #FF512F;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
 @endpush
