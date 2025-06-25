@@ -30,36 +30,45 @@ class InstallerController extends Controller
     /**
      * Instalación rápida - Verificar requisitos
      */
+    private function areAllRequirementsMet(array $requirements): bool
+    {
+        if (!$requirements['php_version']['satisfied']) {
+            return false;
+        }
+        foreach ($requirements['php_extensions'] as $status) {
+            if (!$status['installed']) {
+                return false;
+            }
+        }
+        foreach ($requirements['permissions'] as $status) {
+            if (!$status['satisfied']) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public function quickInstall()
     {
         $requirements = $this->installer->checkRequirements();
-
-        // Verificar si todos los requisitos se cumplen
-        $allPassed = true;
-
-        if (!$requirements['php_version']['satisfied']) {
-            $allPassed = false;
-        }
-
-        foreach ($requirements['php_extensions'] as $extension => $status) {
-            if (!$status['installed']) {
-                $allPassed = false;
-                break;
-            }
-        }
-
-        foreach ($requirements['permissions'] as $path => $status) {
-            if (!$status['satisfied']) {
-                $allPassed = false;
-                break;
-            }
-        }
+        $allPassed = $this->areAllRequirementsMet($requirements);
 
         if (!$allPassed) {
+            // Para la vista de requisitos fallidos, no se muestra una barra de progreso de pasos estándar,
+            // ya que es una desviación del flujo normal. La vista quick-requirements.blade.php
+            // no utiliza $stepsData actualmente.
             return view('installer::quick-requirements', compact('requirements'));
         }
 
-        return view('installer::quick-database');
+        // Si los requisitos se cumplen, se procede a la configuración de la base de datos.
+        $stepsData = [
+            'total' => [
+                ['name' => 'Requisitos', 'status' => 'completed'],
+                ['name' => 'Base de Datos', 'status' => 'active'],
+                ['name' => 'Instalación', 'status' => 'pending'],
+            ]
+        ];
+        return view('installer::quick-database', compact('stepsData'));
     }
 
     /**
@@ -95,13 +104,29 @@ class InstallerController extends Controller
                 'password' => $request->database_password,
             ])
         ) {
-            return back()->withErrors(['database' => 'No se pudo conectar a la base de datos. Verifique los datos ingresados.']);
+            // Es importante repasar los datos de los pasos si volvemos atrás con error
+            $stepsData = [
+                'total' => [
+                    ['name' => 'Requisitos', 'status' => 'completed'],
+                    ['name' => 'Base de Datos', 'status' => 'active'], // Sigue activo porque falló aquí
+                    ['name' => 'Instalación', 'status' => 'pending'],
+                ]
+            ];
+            return back()->withErrors(['database' => 'No se pudo conectar a la base de datos. Verifique los datos ingresados.'])
+                         ->withInput()->with(compact('stepsData'));
         }
 
         // Actualizar archivo .env
         $this->installer->updateEnvironmentFile($dbConfig);
 
-        return view('installer::quick-installing');
+        $stepsData = [
+            'total' => [
+                ['name' => 'Requisitos', 'status' => 'completed'],
+                ['name' => 'Base de Datos', 'status' => 'completed'],
+                ['name' => 'Instalación', 'status' => 'active'],
+            ]
+        ];
+        return view('installer::quick-installing', compact('stepsData'));
     }
 
     /**
@@ -164,6 +189,9 @@ class InstallerController extends Controller
     public function advancedRequirements()
     {
         $requirements = $this->installer->checkRequirements();
+        // La vista advanced-requirements.blade.php define su propio $stepsData
+        // para el estado inicial. Si los requisitos fallan, esta vista se muestra
+        // y no necesita $stepsData del controlador de la misma manera que los pasos exitosos.
         return view('installer::advanced-requirements', compact('requirements'));
     }
 
@@ -172,7 +200,17 @@ class InstallerController extends Controller
      */
     public function advancedDatabase()
     {
-        return view('installer::advanced-database');
+        $stepsData = [
+            'total' => [
+                ['name' => 'Requisitos', 'status' => 'completed'],
+                ['name' => 'Base de Datos', 'status' => 'active'],
+                ['name' => 'Migraciones', 'status' => 'pending'],
+                ['name' => 'Entorno', 'status' => 'pending'],
+                ['name' => 'Config. Final', 'status' => 'pending'],
+                ['name' => 'Instalación', 'status' => 'pending'],
+            ]
+        ];
+        return view('installer::advanced-database', compact('stepsData'));
     }
 
     /**
@@ -198,7 +236,19 @@ class InstallerController extends Controller
                 'password' => $request->database_password,
             ])
         ) {
-            return back()->withErrors(['database' => 'No se pudo conectar a la base de datos.']);
+            // Repasar $stepsData si hay error y se vuelve a la vista anterior
+            $stepsData = [
+                'total' => [
+                    ['name' => 'Requisitos', 'status' => 'completed'],
+                    ['name' => 'Base de Datos', 'status' => 'active'], // Sigue activo
+                    ['name' => 'Migraciones', 'status' => 'pending'],
+                    ['name' => 'Entorno', 'status' => 'pending'],
+                    ['name' => 'Config. Final', 'status' => 'pending'],
+                    ['name' => 'Instalación', 'status' => 'pending'],
+                ]
+            ];
+            return back()->withErrors(['database' => 'No se pudo conectar a la base de datos.'])
+                         ->withInput()->with(compact('stepsData'));
         }
 
         // Guardar configuración en sesión
@@ -221,7 +271,17 @@ class InstallerController extends Controller
      */
     public function advancedMigrations()
     {
-        return view('installer::advanced-migrations');
+        $stepsData = [
+            'total' => [
+                ['name' => 'Requisitos', 'status' => 'completed'],
+                ['name' => 'Base de Datos', 'status' => 'completed'],
+                ['name' => 'Migraciones', 'status' => 'active'],
+                ['name' => 'Entorno', 'status' => 'pending'],
+                ['name' => 'Config. Final', 'status' => 'pending'],
+                ['name' => 'Instalación', 'status' => 'pending'],
+            ]
+        ];
+        return view('installer::advanced-migrations', compact('stepsData'));
     }
 
     /**
@@ -233,23 +293,41 @@ class InstallerController extends Controller
             $dbConfig = session('installer.database');
             if (!$dbConfig) {
                  \Log::error('Installer: Database configuration not found in session during processAdvancedMigrations.');
-                 return back()->withErrors(['migrations' => 'Error crítico: Configuración de base de datos no encontrada. Vuelva al paso anterior y reintente.']);
+                $stepsData = session('installer_steps_data_before_error', $this->getStepsDataForAdvancedMigrations('active')); // Fallback
+                return back()->withErrors(['migrations' => 'Error crítico: Configuración de base de datos no encontrada. Vuelva al paso anterior y reintente.'])
+                             ->withInput()->with(compact('stepsData'));
             }
             // Actualizar .env con configuración de BD
             $this->installer->updateEnvironmentFile($dbConfig);
 
             // Ejecutar migraciones
             if (!$this->installer->runMigrations()) { // runMigrations() ahora verifica Schema::hasTable('users')
-                return back()->withErrors(['migrations' => 'Error al ejecutar las migraciones o la tabla de usuarios no se creó correctamente. Verifique los logs del servidor para más detalles.']);
+                $stepsData = session('installer_steps_data_before_error', $this->getStepsDataForAdvancedMigrations('active')); // Fallback
+                return back()->withErrors(['migrations' => 'Error al ejecutar las migraciones o la tabla de usuarios no se creó correctamente. Verifique los logs del servidor para más detalles.'])
+                             ->withInput()->with(compact('stepsData'));
             }
 
             session(['installer.migrations_run' => true]);
         } else {
-            // Asegurarse de que si el usuario desmarca la opción, la sesión lo refleje.
             session(['installer.migrations_run' => false]);
         }
-
+        // Guardar $stepsData en sesión antes de redirigir, por si hay error en el siguiente paso
+        session(['installer_steps_data_before_error' => $this->getStepsDataForAdvancedEnvironment('pending')]);
         return redirect()->route('installer.advanced.environment');
+    }
+
+    private function getStepsDataForAdvancedMigrations($currentStatus = 'active')
+    {
+        return [
+            'total' => [
+                ['name' => 'Requisitos', 'status' => 'completed'],
+                ['name' => 'Base de Datos', 'status' => 'completed'],
+                ['name' => 'Migraciones', 'status' => $currentStatus],
+                ['name' => 'Entorno', 'status' => $currentStatus === 'completed' ? 'active' : 'pending'],
+                ['name' => 'Config. Final', 'status' => 'pending'],
+                ['name' => 'Instalación', 'status' => 'pending'],
+            ]
+        ];
     }
 
     /**
@@ -257,7 +335,32 @@ class InstallerController extends Controller
      */
     public function advancedEnvironment()
     {
-        return view('installer::advanced-environment');
+        $stepsData = [
+            'total' => [
+                ['name' => 'Requisitos', 'status' => 'completed'],
+                ['name' => 'Base de Datos', 'status' => 'completed'],
+                ['name' => 'Migraciones', 'status' => 'completed'],
+                ['name' => 'Entorno', 'status' => 'active'],
+                ['name' => 'Config. Final', 'status' => 'pending'],
+                ['name' => 'Instalación', 'status' => 'pending'],
+            ]
+        ];
+        session(['installer_steps_data_before_error' => $stepsData]); // Guardar para posible error en el POST
+        return view('installer::advanced-environment', compact('stepsData'));
+    }
+
+    private function getStepsDataForAdvancedEnvironment($currentStatus = 'active')
+    {
+        return [
+            'total' => [
+                ['name' => 'Requisitos', 'status' => 'completed'],
+                ['name' => 'Base de Datos', 'status' => 'completed'],
+                ['name' => 'Migraciones', 'status' => 'completed'],
+                ['name' => 'Entorno', 'status' => $currentStatus],
+                ['name' => 'Config. Final', 'status' => $currentStatus === 'completed' ? 'active' : 'pending'],
+                ['name' => 'Instalación', 'status' => 'pending'],
+            ]
+        ];
     }
 
     /**
@@ -314,7 +417,17 @@ class InstallerController extends Controller
      */
     public function advancedFinalConfig()
     {
-        return view('installer::advanced-final-config');
+        $stepsData = [
+            'total' => [
+                ['name' => 'Requisitos', 'status' => 'completed'],
+                ['name' => 'Base de Datos', 'status' => 'completed'],
+                ['name' => 'Migraciones', 'status' => 'completed'],
+                ['name' => 'Entorno', 'status' => 'completed'],
+                ['name' => 'Config. Final', 'status' => 'active'],
+                ['name' => 'Instalación', 'status' => 'pending'],
+            ]
+        ];
+        return view('installer::advanced-final-config', compact('stepsData'));
     }
 
     /**
@@ -334,7 +447,17 @@ class InstallerController extends Controller
             ]
         ]);
 
-        return view('installer::advanced-installing');
+        $stepsData = [
+            'total' => [
+                ['name' => 'Requisitos', 'status' => 'completed'],
+                ['name' => 'Base de Datos', 'status' => 'completed'],
+                ['name' => 'Migraciones', 'status' => 'completed'],
+                ['name' => 'Entorno', 'status' => 'completed'],
+                ['name' => 'Config. Final', 'status' => 'completed'],
+                ['name' => 'Instalación', 'status' => 'active'],
+            ]
+        ];
+        return view('installer::advanced-installing', compact('stepsData'));
     }
 
     /**

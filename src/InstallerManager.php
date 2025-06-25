@@ -342,12 +342,27 @@ class InstallerManager
             $bootstrapPath = base_path('bootstrap/app.php');
             if (File::exists($bootstrapPath)) {
                 $content = File::get($bootstrapPath);
-                $content = str_replace(
-                    '->withRouting(',
-                    '// API disabled by installer' . PHP_EOL . '    ->withRouting(',
-                    $content
-                );
-                File::put($bootstrapPath, $content);
+                $originalRoutingLine = '->withRouting(';
+                $commentedRoutingLine = '// API disabled by installer' . PHP_EOL . '    ->withRouting('; // Mantener indentación original
+
+                // Verificar si ya está comentado por este instalador
+                if (strpos($content, $commentedRoutingLine) === false) {
+                    // Verificar si la línea original existe y no está ya comentada de otra forma
+                    if (strpos($content, $originalRoutingLine) !== false && strpos($content, '//' . $originalRoutingLine) === false) {
+                        $content = str_replace(
+                            $originalRoutingLine,
+                            $commentedRoutingLine,
+                            $content
+                        );
+                        File::put($bootstrapPath, $content);
+                    } elseif (strpos($content, $originalRoutingLine) === false && strpos($content, '//' . $originalRoutingLine) !== false) {
+                        // La línea original no se encontró, pero una versión comentada sí.
+                        // Podría ser comentada manualmente o por otro proceso. No hacer nada para evitar conflictos.
+                        \Log::info('Installer: API routing line in bootstrap/app.php seems to be already commented. Skipping modification.');
+                    }
+                } else {
+                    \Log::info('Installer: API routing line in bootstrap/app.php already commented by this installer. Skipping.');
+                }
             }
 
             return true;
