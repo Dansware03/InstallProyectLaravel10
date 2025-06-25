@@ -65,10 +65,18 @@ class ResetInstallCommand extends Command
 
                 // 3. Generar nueva APP_KEY
                 $this->call('key:generate', ['--force' => true]);
-                $this->line('<fg=green>[✔]</> New APP_KEY generated.');
+
+                // Verificar si la APP_KEY fue realmente escrita y no está vacía
+                $envContent = File::get($envPath);
+                if (preg_match('/^APP_KEY=(.+)$/m', $envContent, $matches) && !empty(trim($matches[1])) && strlen(trim($matches[1])) > 16 ) { // Verifica que no esté vacía y tenga una longitud razonable
+                    $this->line('<fg=green>[✔]</> New APP_KEY generated and verified in .env file.');
+                } else {
+                    $this->error('[✘] APP_KEY generation may have failed. APP_KEY is missing, empty, or too short in .env file.');
+                    $this->warn('   Please check file permissions for ".env" or run "php artisan key:generate" manually.');
+                }
 
             } catch (\Exception $e) {
-                $this->error('[✘] Failed to reset .env file or generate APP_KEY: ' . $e->getMessage());
+                $this->error('[✘] Failed to reset .env file or generate/verify APP_KEY: ' . $e->getMessage());
             }
         } else {
             $this->warn('[!] .env.example not found. Skipping .env reset and key generation.');
@@ -136,6 +144,15 @@ class ResetInstallCommand extends Command
             $this->warn('[!] Skipped re-enabling API routing in bootstrap/app.php because routes/api.php could not be ensured.');
         } elseif (!File::exists($bootstrapPath)) {
             $this->warn('[!] bootstrap/app.php not found. Skipping API routing modification.');
+        }
+
+        // 6. Limpiar cachés de optimización
+        try {
+            $this->line('<fg=cyan>[INFO]</> Clearing all optimized caches (config, route, view, etc.)...');
+            $this->call('optimize:clear');
+            $this->line('<fg=green>[✔]</> Optimized caches cleared successfully.');
+        } catch (\Exception $e) {
+            $this->error('[✘] Failed to clear optimized caches: ' . $e->getMessage());
         }
 
         $this->info('Project reset process completed.');
