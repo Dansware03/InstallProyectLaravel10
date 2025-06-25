@@ -145,8 +145,12 @@ class InstallerController extends Controller
                 'credentials' => $credentials
             ]);
 
-        } catch (\Exception $e) {
-            \Log::error('Installation error: ' . $e->getMessage());
+        } catch (\Throwable $e) { // Capturar Throwable
+            \Log::error('Installer execution quick failed: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Error durante la instalación: ' . $e->getMessage()
@@ -317,12 +321,20 @@ class InstallerController extends Controller
     public function executeAdvancedInstall()
     {
         try {
+            $finalConfig = session('installer.final_config');
+
+            if (!$finalConfig || !isset($finalConfig['environment_type']) || !isset($finalConfig['disable_api'])) {
+                \Log::error('Installer: Missing or incomplete final_config in session during executeAdvancedInstall.', ['session_data' => session()->all()]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error interno: La configuración final es inválida o no se encontró en la sesión. Por favor, reinicie el proceso de instalación.'
+                ]);
+            }
+
             // Actualizar configuración de entorno
             if (session('installer.environment')) {
                 $this->installer->updateEnvironmentFile(session('installer.environment'));
             }
-
-            $finalConfig = session('installer.final_config');
 
             // Aplicar configuraciones según el tipo de entorno
             if ($finalConfig['environment_type'] === 'production') {
@@ -354,10 +366,20 @@ class InstallerController extends Controller
                 'credentials' => $credentials
             ]);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) { // Capturar Throwable para errores más generales también
+            // Loggear más detalles del error
+            \Log::error('Installer execution advanced failed: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'session_data' => session()->all() // Loguear datos de sesión puede ayudar a diagnosticar
+            ]);
             return response()->json([
                 'success' => false,
+                // No exponer detalles sensibles del error al cliente en producción, pero sí en desarrollo.
+                // Para este paquete, dado que es una herramienta de instalación, podría ser útil mostrar más.
                 'message' => 'Error durante la instalación: ' . $e->getMessage()
+                             // . (config('app.debug') ? ' (' . basename($e->getFile()) . ':' . $e->getLine() . ')' : '')
             ]);
         }
     }
