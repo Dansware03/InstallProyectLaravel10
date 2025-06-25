@@ -1,10 +1,10 @@
 <?php
 
-namespace Dansware03\LaravelInstaller\Http\Middleware;
+namespace dansware03\laravelinstaller\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Dansware03\LaravelInstaller\InstallerManager;
+use dansware03\laravelinstaller\InstallerManager;
 
 class InstallationMiddleware
 {

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Dansware03\LaravelInstaller\Http\Controllers\InstallerController;
+use dansware03\laravelinstaller\Http\Controllers\InstallerController;
 
 Route::group([
     'prefix' => config('installer.route.prefix', 'install'),

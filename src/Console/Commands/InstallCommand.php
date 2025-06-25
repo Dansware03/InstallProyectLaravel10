@@ -1,9 +1,9 @@
 <?php
 
-namespace Dansware03\LaravelInstaller\Console\Commands;
+namespace dansware03\laravelinstaller\Console\Commands;
 
 use Illuminate\Console\Command;
-use Dansware03\LaravelInstaller\InstallerManager;
+use dansware03\laravelinstaller\InstallerManager;
 
 class InstallCommand extends Command
 {

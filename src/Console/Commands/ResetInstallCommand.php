@@ -1,10 +1,10 @@
 <?php
 
-namespace Dansware03\LaravelInstaller\Console\Commands;
+namespace dansware03\laravelinstaller\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
-use Dansware03\LaravelInstaller\InstallerManager;
+use dansware03\laravelinstaller\InstallerManager;
 
 class ResetInstallCommand extends Command
 {

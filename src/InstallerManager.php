@@ -1,6 +1,6 @@
 <?php
 
-namespace Dansware03\LaravelInstaller;
+namespace dansware03\laravelinstaller;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Artisan;

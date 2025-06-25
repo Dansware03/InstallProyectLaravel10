@@ -1,10 +1,10 @@
 <?php
 
-namespace Dansware03\LaravelInstaller;
+namespace dansware03\laravelinstaller;
 
 use Illuminate\Support\ServiceProvider;
-use Dansware03\LaravelInstaller\Http\Middleware\InstallationMiddleware;
-use Dansware03\LaravelInstaller\Console\Commands;
+use dansware03\laravelinstaller\Http\Middleware\InstallationMiddleware;
+use dansware03\laravelinstaller\Console\Commands;
 
 class LaravelInstallerServiceProvider extends ServiceProvider
 {

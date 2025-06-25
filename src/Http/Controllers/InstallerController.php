@@ -1,10 +1,10 @@
 <?php
 
-namespace Dansware03\LaravelInstaller\Http\Controllers;
+namespace dansware03\laravelinstaller\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Dansware03\LaravelInstaller\InstallerManager;
+use dansware03\laravelinstaller\InstallerManager;
 
 class InstallerController extends Controller
 {

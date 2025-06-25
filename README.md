@@ -57,7 +57,7 @@ Si deseas proteger toda tu aplicación hasta que esté instalada, añade el midd
 ```php
 protected $middleware = [
     // ... otros middlewares
-    \Dansware03\LaravelInstaller\Http\Middleware\InstallationMiddleware::class,
+    \dansware03\laravelinstaller\Http\Middleware\InstallationMiddleware::class,
 ];
 ```
 
@@ -232,7 +232,7 @@ Puedes crear tu propio middleware extendiendo el incluido:
 
 namespace App\Http\Middleware;
 
-use Dansware03\LaravelInstaller\Http\Middleware\InstallationMiddleware as BaseMiddleware;
+use dansware03\laravelinstaller\Http\Middleware\InstallationMiddleware as BaseMiddleware;
 
 class CustomInstallationMiddleware extends BaseMiddleware
 {

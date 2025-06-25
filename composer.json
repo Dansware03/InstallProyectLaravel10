@@ -1,5 +1,5 @@
 {
-  "name": "dansware03/laravel-installer",
+  "name": "dansware03/laravelinstaller",
   "description": "Asistente de instalación interactivo para aplicaciones Laravel 10",
   "type": "library",
   "version": "1.0.0",
@@ -11,8 +11,8 @@
   ],
   "support": {
     "email": "dansware2003@gmail.com",
-    "issues": "https://github.com/Dansware03/laravel-installer/issues",
-    "source": "https://github.com/Dansware03/laravel-installer"
+    "issues": "https://github.com/Dansware03/laravelinstaller/issues",
+    "source": "https://github.com/Dansware03/laravelinstaller"
   },
   "license": "MIT",
   "authors": [
@@ -37,7 +37,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Dansware03\\LaravelInstaller\\": "src/"
+      "dansware03\\laravelinstaller\\": "src/"
     },
     "files": [
       "src/helpers.php"
@@ -45,13 +45,13 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Dansware03\\LaravelInstaller\\Tests\\": "tests/"
+      "dansware03\\laravelinstaller\\Tests\\": "tests/"
     }
   },
   "extra": {
     "laravel": {
       "providers": [
-        "Dansware03\\LaravelInstaller\\LaravelInstallerServiceProvider"
+        "dansware03\\laravelinstaller\\LaravelInstallerServiceProvider"
       ]
     }
   },
