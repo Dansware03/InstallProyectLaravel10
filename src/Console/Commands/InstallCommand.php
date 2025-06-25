@@ -19,7 +19,7 @@ class InstallCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Install the Laravel application using command line';
+    protected $description = 'Provides guidance on how to start the web-based installation process.';
 
     /**
      * The installer manager instance.
@@ -50,8 +50,15 @@ class InstallCommand extends Command
             return 1;
         }
 
-        $this->info('Installation completed via web interface is recommended.');
-        $this->info('Visit /install in your browser to start the installation.');
+        $this->line("--------------------------------------------------------------------");
+        $this->line(" Laravel Application Installer ");
+        $this->line("--------------------------------------------------------------------");
+        $this->comment("This command does not perform the installation via command line.");
+        $this->comment("To install your Laravel application, please use the web interface.");
+        $this->info("1. Ensure your web server (e.g., Nginx, Apache) is running and configured.");
+        $this->info("2. Open your web browser and navigate to your application's URL followed by '/install'.");
+        $this->info("   Example: http://your-app-domain.test/install");
+        $this->line("Follow the on-screen instructions to complete the installation.");
         
         return 0;
     }

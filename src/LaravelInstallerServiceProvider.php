@@ -42,11 +42,6 @@ class LaravelInstallerServiceProvider extends ServiceProvider
             __DIR__.'/../resources/assets' => public_path('vendor/installer'),
         ], 'installer-assets');
 
-        // Publicar migraciones
-        $this->publishes([
-            __DIR__.'/../database/migrations' => database_path('migrations'),
-        ], 'installer-migrations');
-
         // Cargar vistas
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'installer');
 

@@ -54,7 +54,7 @@
                         <div class="input-group mt-1">
                             <input type="text" class="form-control" id="admin-email" readonly>
                             <button class="btn btn-outline-secondary" type="button"
-                                onclick="copyToClipboard('admin-email')">
+                                onclick="copyToClipboard('admin-email', this)">
                                 <i class="fas fa-copy"></i>
                             </button>
                         </div>
@@ -64,7 +64,7 @@
                         <div class="input-group mt-1">
                             <input type="text" class="form-control" id="admin-password" readonly>
                             <button class="btn btn-outline-secondary" type="button"
-                                onclick="copyToClipboard('admin-password')">
+                                onclick="copyToClipboard('admin-password', this)">
                                 <i class="fas fa-copy"></i>
                             </button>
                         </div>
@@ -194,24 +194,43 @@
             }
 
             // Función para copiar al portapapeles
-            window.copyToClipboard = function (elementId) {
+            window.copyToClipboard = function (elementId, buttonElement) {
                 const element = document.getElementById(elementId);
-                element.select();
-                element.setSelectionRange(0, 99999);
-                document.execCommand('copy');
+                if (!element) return;
 
-                // Mostrar feedback
-                const button = element.nextElementSibling;
-                const originalText = button.innerHTML;
-                button.innerHTML = '<i class="fas fa-check"></i>';
-                button.classList.add('btn-success');
-                button.classList.remove('btn-outline-secondary');
+                navigator.clipboard.writeText(element.value).then(function() {
+                    const originalHtml = buttonElement.innerHTML;
+                    buttonElement.innerHTML = '<i class="fas fa-check"></i> Copiado';
+                    buttonElement.classList.add('btn-success');
+                    buttonElement.classList.remove('btn-outline-secondary');
 
-                setTimeout(() => {
-                    button.innerHTML = originalText;
-                    button.classList.remove('btn-success');
-                    button.classList.add('btn-outline-secondary');
-                }, 2000);
+                    setTimeout(() => {
+                        buttonElement.innerHTML = originalHtml;
+                        buttonElement.classList.remove('btn-success');
+                        buttonElement.classList.add('btn-outline-secondary');
+                    }, 2000);
+                }, function(err) {
+                    // Fallback para execCommand si navigator.clipboard no está disponible o falla
+                    try {
+                        element.select();
+                        element.setSelectionRange(0, 99999); // Para móviles
+                        document.execCommand('copy');
+
+                        const originalHtml = buttonElement.innerHTML;
+                        buttonElement.innerHTML = '<i class="fas fa-check"></i> Copiado (fallback)';
+                        buttonElement.classList.add('btn-success');
+                        buttonElement.classList.remove('btn-outline-secondary');
+
+                        setTimeout(() => {
+                            buttonElement.innerHTML = originalHtml;
+                            buttonElement.classList.remove('btn-success');
+                            buttonElement.classList.add('btn-outline-secondary');
+                        }, 2000);
+                    } catch (execErr) {
+                        console.error('Error al copiar al portapapeles: ', execErr);
+                        alert('Error al copiar. Por favor, copie manualmente.');
+                    }
+                });
             };
 
             // Iniciar el proceso
